@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">InstagramClone</string>
+    <string name="add_photo_explain">문구 입력...</string>
+</resources>
