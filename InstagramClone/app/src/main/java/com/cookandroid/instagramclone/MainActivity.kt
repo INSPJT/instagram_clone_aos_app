@@ -2,6 +2,7 @@ package com.cookandroid.instagramclone
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 
 class MainActivity : AppCompatActivity() {
 
@@ -10,6 +11,13 @@ class MainActivity : AppCompatActivity() {
         //setContentView(R.layout.activity_add_photo)
         //setContentView(R.layout.post_explanation)
 
-        setContentView(R.layout.main_navigation)
+        setContentView(R.layout.posting)
+
+        val user = intent.getParcelableExtra<User>("user")
+
+        Log.i("accessToken",user!!.accessToken.toString())
+        Log.i("email",user.email.toString())
+        Log.i("pw",user.password.toString())
+
     }
 }
