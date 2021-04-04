@@ -1,33 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cookandroid.instagramclone">
-<<<<<<< HEAD
-    <uses-permission android:name="android.permission.INTERNET" />
     <!--갤러리 권한-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <!--갤러리 권한-->
     <uses-permission android:name="android.permission.CAMERA"/>
-
-=======
-
-    <uses-permission android:name="android.permission.INTERNET" />
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> ce06c286fe5a21d8b9ac4468c379ae822abe7527
-=======
-=======
->>>>>>> Stashed changes
-    <!--갤러리 권한-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <!--갤러리 권한-->
-    <uses-permission android:name="android.permission.CAMERA"/>
-
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
     <application
         android:allowBackup="true"
@@ -40,12 +18,12 @@
         android:requestLegacyExternalStorage="true"
         >
         <activity android:name=".LoginActivity">
-        </activity>
-        <activity android:name=".AddPhotoActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".AddPhotoActivity" >
         </activity>
         <activity android:name=".MainActivity">
         </activity>

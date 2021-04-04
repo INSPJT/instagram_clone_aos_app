@@ -12,16 +12,4 @@ interface LoginService {
     fun Login(
         @Body params : HashMap<String,String>
     ) : Call<User>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> ce06c286fe5a21d8b9ac4468c379ae822abe7527
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
