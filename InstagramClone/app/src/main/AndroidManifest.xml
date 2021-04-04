@@ -12,7 +12,16 @@
 =======
 
     <uses-permission android:name="android.permission.INTERNET" />
+<<<<<<< Updated upstream
 >>>>>>> ce06c286fe5a21d8b9ac4468c379ae822abe7527
+=======
+    <!--갤러리 권한-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!--갤러리 권한-->
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+>>>>>>> Stashed changes
 
     <application
         android:allowBackup="true"
@@ -21,16 +30,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true"
+        >
         <activity android:name=".LoginActivity">
+        </activity>
+        <activity android:name=".AddPhotoActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddPhotoActivity" />
         <activity android:name=".MainActivity">
-
         </activity>
     </application>
 </manifest>

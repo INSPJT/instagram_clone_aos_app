@@ -17,11 +17,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class LoginActivity : AppCompatActivity() {
+<<<<<<< Updated upstream
 <<<<<<< HEAD
     val url = "http://117.17.196.61:80" // 접속 url
 =======
     val url = "http://13.209.101.178:80" // 접속 url
 >>>>>>> ce06c286fe5a21d8b9ac4468c379ae822abe7527
+=======
+    val url = "http://117.17.196.61:80" // 접속 url
+>>>>>>> Stashed changes
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
