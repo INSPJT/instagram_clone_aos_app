@@ -51,9 +51,13 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <<<<<<< HEAD
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 =======
+=======
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+>>>>>>> Stashed changes
 =======
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 >>>>>>> Stashed changes
