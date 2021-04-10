@@ -17,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class LoginActivity : AppCompatActivity() {
-    val url = "http://13.209.101.178:80" // 접속 url
+    val url = "http://117.17.196.61:80" // 접속 url
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

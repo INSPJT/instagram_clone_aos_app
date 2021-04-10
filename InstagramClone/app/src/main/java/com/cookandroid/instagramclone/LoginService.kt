@@ -12,7 +12,4 @@ interface LoginService {
     fun Login(
         @Body params : HashMap<String,String>
     ) : Call<User>
-
-
-
 }
