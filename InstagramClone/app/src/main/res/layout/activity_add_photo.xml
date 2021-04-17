@@ -31,6 +31,7 @@
             </Button>
             <Button
                 android:layout_width="40dp"
+                android:id="@+id/add_photo_btn"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:text=">">
@@ -46,6 +47,7 @@
         android:weightSum="100">
         <ImageView
             android:layout_width="match_parent"
+            android:id="@+id/selected_image"
             android:layout_height="0dp"
             android:src="@drawable/rabbit"
             android:layout_weight="50">

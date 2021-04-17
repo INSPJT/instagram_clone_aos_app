@@ -47,13 +47,11 @@
         android:layout_height="0dp"
         android:layout_weight="8"
         >
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,106 +124,12 @@
                         ></ImageView>
                 </LinearLayout>
             </HorizontalScrollView>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_below="@id/usersHorizontal"
-                    android:orientation="vertical">
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="post"></Button>
-<!--                    <androidx.appcompat.widget.Toolbar-->
-<!--                        android:id = "@+id/myToolBar"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        ></androidx.appcompat.widget.Toolbar>-->
-
-                </LinearLayout>
-            </RelativeLayout>
-        </ScrollView>
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/recycler1"-->
-<!--        android:scrollbars="vertical"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"/>-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/main_navigation_recyclerView"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
 </RelativeLayout>
 
 
@@ -238,50 +142,4 @@
         app:itemBackground="@color/colorPrimaryDark"
         >
     </com.google.android.material.bottomnavigation.BottomNavigationView>
-<!--    <LinearLayout-->
-<!--        android:layout_height="0dp"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_weight="1"-->
-<!--        android:orientation="horizontal"-->
-<!--        >-->
-
-<!--        <Button-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:text="H"-->
-<!--            android:id="@+id/homeBtn"-->
-<!--            android:layout_weight="1"-->
-<!--            android:layout_toLeftOf="@id/postingBtn">-->
-<!--        </Button>-->
-<!--        <Button-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:text="F"-->
-<!--            android:id="@+id/findBtn"-->
-<!--            android:layout_weight="1"-->
-<!--            android:layout_toLeftOf="@id/postingBtn">-->
-<!--        </Button>-->
-<!--        <Button-->
-<!--            android:layout_weight="1"-->
-<!--            android:layout_centerInParent="true"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:text="+"-->
-<!--            android:id="@+id/postingBtn"-->
-<!--            ></Button>-->
-<!--        <Button-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:text="S"-->
-<!--            android:layout_weight="1"-->
-<!--            android:id="@+id/shopBtn">-->
-<!--        </Button>-->
-<!--        <Button-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:text="P"-->
-<!--            android:layout_weight="1"-->
-<!--            android:id="@+id/ProfileBtn">-->
-<!--        </Button>-->
-<!--    </LinearLayout>-->
 </LinearLayout>
