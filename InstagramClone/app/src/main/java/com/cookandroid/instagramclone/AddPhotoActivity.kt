@@ -50,77 +50,15 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import androidx.constraintlayout.motion.widget.MotionScene.Transition as Transition1
+
 
 class AddPhotoActivity : AppCompatActivity() {
-    val REQUEST_CODE_SIGN_IN = 1
-    val REQUEST_CODE_OPEN_DOCUMENT = 2
     val TAG = "AddPhotoActivity"
-    var mDriveServiceHelper: DriverServiceHelper? = null
     var imageSelected: ImageData? = null
-
-    private fun requestSignIn() {
-        Log.d(TAG, "Requesting Sign in")
-
-        var signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestScopes(Scope(DriveScopes.DRIVE_FILE))
-            .build()
-        var client = GoogleSignIn.getClient(this, signInOptions)
-
-        startActivityForResult(client.getSignInIntent(), REQUEST_CODE_SIGN_IN)
-    }
-
-    private fun handleSignInResult(result: Intent) {
-        GoogleSignIn.getSignedInAccountFromIntent(result)
-            .addOnSuccessListener{
-                Log.d(TAG, "singed in as "+it.email)
-                var credential = GoogleAccountCredential.usingOAuth2(this, Collections.singleton(DriveScopes.DRIVE_FILE))
-                credential.selectedAccount = it.account
-                var googleDriverService = Drive.Builder(
-                    AndroidHttp.newCompatibleTransport(),
-                    GsonFactory(),
-                    credential)
-                    .setApplicationName("Drive API Migration")
-                    .build()
-                mDriveServiceHelper = DriverServiceHelper(googleDriverService)
-                mDriveServiceHelper?.queryFile()?.addOnSuccessListener {
-                    Log.d(TAG,"read file success")
-                }?.addOnFailureListener{
-                    Log.d(TAG,"read files Failed")
-                }
-            }
-            .addOnFailureListener{
-                    exception -> Log.e(TAG,"Unable to sign in.",exception)
-            }
-    }
-
-    fun openFIleFromFilePicker(uri: Uri){
-        if(mDriveServiceHelper != null){
-            Log.d(TAG, "Opening " + uri.path)
-            mDriveServiceHelper?.openFileUsingStorageAccessFramework(contentResolver, uri)
-        }
-        else{
-            Log.d(TAG, "Opening " + uri.path + " failed")
-        }
-    }
+    private val sdf = SimpleDateFormat("yyyy-MM-dd:HH:mm:ss.SSS")
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
-            REQUEST_CODE_SIGN_IN-> {
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    handleSignInResult(data)
-                }
-            }
-            REQUEST_CODE_OPEN_DOCUMENT->{
-                if(resultCode == Activity.RESULT_OK && data != null) {
-                    val uri = data.getData()
-                    if(uri!=null){
-                        openFIleFromFilePicker(uri)
-                    }
-                }
-            }
-        }
+        if(INTERNET_REQUEST.activityResult != null) INTERNET_REQUEST.activityResult!!(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -171,14 +109,33 @@ class AddPhotoActivity : AppCompatActivity() {
         addPhotoRecyclerView.adapter = UserFragmentRecyclerViewAdapter(imageList)
         addPhotoRecyclerView.layoutManager = GridLayoutManager(this, 3)
 
-        requestSignIn()
-
+        val googleService = GoogleServiceManager()
+        InternetService.setInternetBase(googleService).init(GoogleServiceInitData(this)
+            {requestCode: Int, resultCode: Int, data: Intent? ->
+                when (requestCode) {
+                    INTERNET_REQUEST.REQUEST_CODE_SIGN_IN -> {
+                        if (resultCode == Activity.RESULT_OK && data != null) {
+                            InternetService.asGoogleServiceManager()
+                                .handleSignInResult(this, data)
+                        }
+                    }
+                    INTERNET_REQUEST.REQUEST_CODE_OPEN_DOCUMENT -> {
+                        if (resultCode == Activity.RESULT_OK && data != null) {
+                            val uri = data.data
+                            if (uri != null) {
+                                googleService.openFIleFromFilePicker(this, uri)
+                            }
+                        }
+                    }
+                }
+            }
+        )
         add_photo_btn.setOnClickListener{
-            var sdf = SimpleDateFormat("yyyy-MM-dd:HH:mm:ss.SSS")
             var name = sdf.format(Date())
-            if(imageSelected != null) mDriveServiceHelper?.createFile(name, imageSelected!!.file)
+            if(imageSelected != null) {
+                InternetService.createFile(GoogleServiceCreateData(name, imageSelected!!.file))
+            }
             else throw(IOException("image file is null"))
-            Log.d(TAG, "Upload id: $name")
         }
     }
 
