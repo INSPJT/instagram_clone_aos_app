@@ -8,6 +8,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //setContentView(R.layout.activity_add_photo)
+        //setContentView(R.layout.post_explanation)
 
         setContentView(R.layout.posting)
 
