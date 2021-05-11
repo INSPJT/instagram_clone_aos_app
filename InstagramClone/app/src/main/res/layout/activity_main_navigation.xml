@@ -66,6 +66,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/ic_account"
+                        android:id="@+id/myProfile"
                         ></ImageView>
                     <ImageView
                         android:layout_width="match_parent"
@@ -130,7 +131,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </LinearLayout>
-</RelativeLayout>
+    </RelativeLayout>
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -142,4 +143,5 @@
         app:itemBackground="@color/colorPrimaryDark"
         >
     </com.google.android.material.bottomnavigation.BottomNavigationView>
+
 </LinearLayout>

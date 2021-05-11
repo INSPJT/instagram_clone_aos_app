@@ -59,5 +59,11 @@
         android:layout_marginBottom="196dp"
         android:text="Login" />
 
-
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/register_bun"
+        android:layout_marginBottom="100dp"
+        android:layout_alignParentBottom="true"
+        android:text="Register"/>
 </RelativeLayout>
