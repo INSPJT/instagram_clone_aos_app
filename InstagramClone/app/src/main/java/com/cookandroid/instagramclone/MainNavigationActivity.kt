@@ -26,11 +26,7 @@ import androidx.fragment.app.Fragment
 
 
 class MainNavigationActivity : AppCompatActivity() {
-    fun myfunc(a: Context?){
-
-    }
     val TAG = "MainNavigationActivity"
-    val googleImageUrl = "https://drive.google.com/uc?export=view&id="
     var files = ArrayList<String>()
     var googleService: GoogleServiceManager? = null
     companion object{
@@ -40,7 +36,7 @@ class MainNavigationActivity : AppCompatActivity() {
 
     var onFilesGet = {data:Any?->
         var array = data as ArrayList<String>
-        if(array.size > 0) Glide.with(this).load(googleImageUrl+array[0]).into(myProfile)
+        if(array.size > 0) Glide.with(this).load(InternetService.internetBase?.baseUrl+array[0]).into(myProfile)
 //        array.forEach{Log.d(TAG, "file id get id: " + it); Glide.with(this).load(googleImageUrl+it).into(myProfile)}
         Unit
     }

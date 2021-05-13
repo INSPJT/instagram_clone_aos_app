@@ -4,6 +4,7 @@ import android.content.Intent
 import java.io.IOException
 
 interface InternetServiceClass{
+    val baseUrl: String
     val TAG: String
     fun createFile(data: Any? = null)
     fun init(data: Any? = null, func:((Any?)->Unit)?=null)
@@ -28,6 +29,9 @@ object InternetService {
         return internetBase?.fileList(data,func) ?: ArrayList()
     }
     fun readFile(data: Any?=null, func: ((Any?)->Unit)?=null): String {return internetBase?.readFile(data,func) ?: throw IOException("result is null")
+    }
+    fun getBaseUrl(): String{
+        return internetBase?.baseUrl ?: throw(IOException("null pointer exception"))
     }
 }
 

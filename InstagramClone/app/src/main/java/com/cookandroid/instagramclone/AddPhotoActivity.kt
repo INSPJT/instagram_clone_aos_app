@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -19,8 +20,11 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.constraintlayout.motion.widget.MotionScene
@@ -44,6 +48,10 @@ import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import kotlinx.android.synthetic.main.activity_add_photo.*
 import kotlinx.android.synthetic.main.activity_add_photo.view.*
+import kotlinx.android.synthetic.main.add_viewholder.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -53,12 +61,19 @@ import kotlin.collections.ArrayList
 
 
 class AddPhotoActivity : AppCompatActivity() {
+    val TEMP_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMiIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE2MTk4NTk1MzR9.KlWL_IBoSRO89FgjFhqCPlLYG4D4qnSADBlqV6g0L1ADUet9oY8sGM13g_yQTPtSG9-vWvmjW7oh9BjNPRmk8Q"
     val TAG = "AddPhotoActivity"
-    var imageSelected: ImageData? = null
     private val sdf = SimpleDateFormat("yyyy-MM-dd:HH:mm:ss.SSS")
 
+    fun sendURL(url: String){
+        Log.d(TAG, "Send URL $url")
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(INTERNET_REQUEST.activityResult != null) INTERNET_REQUEST.activityResult!!(requestCode, resultCode, data)
+        INTERNET_REQUEST.activityResult?.let{
+            Log.d(TAG, "on Activity Result")
+            it(requestCode, resultCode, data)
+        }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -101,6 +116,39 @@ class AddPhotoActivity : AppCompatActivity() {
         }
     }
 
+    var sendUrlToServer = {url:ArrayList<String> ->
+        Log.d(TAG, "send url to server")
+        var retrofit = InternetCommunication.getRetrofitString()
+        var retrofitService = retrofit.create(PostService::class.java)
+
+        var service = retrofitService?.post(PostData("test", url))
+        var a =
+
+        service?.enqueue(object: Callback<String>{
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d(TAG, "fail ${t.message}")
+            }
+
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                var message:String = when(response.code()){
+                    200-> {
+                        Toast.makeText(
+                            this@AddPhotoActivity,
+                            "${response.body().toString()}",
+                            Toast.LENGTH_LONG
+                        )
+                        "Sucess"
+                    }
+                    401-> "Unauthorized"
+                    403-> "Forbidden"
+                    404-> "Not Found"
+                    else-> "Failed"
+                }
+                Log.d(TAG, "send uri to server $message")
+            }
+        })
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_photo)
@@ -108,6 +156,7 @@ class AddPhotoActivity : AppCompatActivity() {
         val imageList = getPathOfAllImages()
         addPhotoRecyclerView.adapter = UserFragmentRecyclerViewAdapter(imageList)
         addPhotoRecyclerView.layoutManager = GridLayoutManager(this, 3)
+        TokenManager.addTokenHeader(TEMP_TOKEN)
 
         val googleService = GoogleServiceManager()
         InternetService.setInternetBase(googleService).init(GoogleServiceInitData(this)
@@ -130,53 +179,98 @@ class AddPhotoActivity : AppCompatActivity() {
                 }
             }
         )
+
+        multiClickBtn.setOnClickListener {
+            var adapter = addPhotoRecyclerView.adapter as UserFragmentRecyclerViewAdapter
+            adapter.checkedViewHolder.clear()
+            adapter.notifyDataSetChanged()
+            adapter.visible = !adapter.visible
+        }
+
         add_photo_btn.setOnClickListener{
-            var name = sdf.format(Date())
-            if(imageSelected != null) {
-                InternetService.createFile(GoogleServiceCreateData(name, imageSelected!!.file))
+            var imageSelected = (addPhotoRecyclerView.adapter as UserFragmentRecyclerViewAdapter).checkedViewHolder
+            var fileList = ArrayList<FileData>()
+            imageSelected.forEach{ it2 ->
+                it2.imageData?.let{
+                    var name = sdf.format(Date())
+                    fileList.add(FileData(name, it.file))
+                } ?: throw(IOException("image file is null"))
             }
-            else throw(IOException("image file is null"))
+            InternetService.createFile(GoogleServiceCreateData(fileList,sendUrlToServer))
+//            {urls:ArrayList<String>->
+//                var str = ""
+//                urls.forEach{str += "\n$it" }
+//                Log.d(TAG,"complete tasks\n$str")
+//            })
         }
     }
 
     inner class UserFragmentRecyclerViewAdapter(private var images: ArrayList<String>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        var visible = false
+        var checkedViewHolder = ArrayList<CustomViewHolder>()
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             var width = resources.displayMetrics.widthPixels / 3
-            var imageView = ImageView(parent.context)
-            imageView.layoutParams = LinearLayoutCompat.LayoutParams(width, width)
-            return CustomViewHolder(imageView)
+            var view = LayoutInflater.from(parent.context).inflate(R.layout.add_viewholder,parent, false)
+            view.layoutParams = LinearLayoutCompat.LayoutParams(width, width)
+
+            return CustomViewHolder(view)
         }
 
-        inner class CustomViewHolder(var imageView: ImageView) :
-            RecyclerView.ViewHolder(imageView) {
+        inner class CustomViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
+            var imageData : ImageData? = null
+            var checkedIdx = 0
+            var imageView: ImageView = view.findViewById(R.id.viewHolder_img)
+            var checkView: TextView = view.findViewById(R.id.viewHolder_check)
+            init {
+                checkView.layoutParams.width = view.layoutParams.width/5
+                checkView.layoutParams.height = view.layoutParams.width/5
+            }
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             var imageView = (holder as CustomViewHolder).imageView
+            var viewHolder:CustomViewHolder = holder
             var file = File(images[position])
-
             var load = Glide.with(holder.itemView.context).load(file).apply(RequestOptions().centerCrop())
             var bitmap: Bitmap? = null
             load.into(imageView)
-            imageView.setOnClickListener {
+
+            if(!visible) viewHolder.checkedIdx=0
+            viewHolder.imageData = ImageData(uri = images[position], file = file, bitmap = bitmap)
+
+            viewHolder.view.setOnClickListener {
                 load.into(selected_image)
-                imageSelected = ImageData(uri = images[position], file = file, bitmap = bitmap)
+                if(visible){
+                    if(viewHolder.checkedIdx != 0) {
+                        viewHolder.checkView.text = ""
+                        checkedViewHolder.removeAt(viewHolder.checkedIdx-1)
+                        for(i in (viewHolder.checkedIdx-1) until checkedViewHolder.size){
+                            checkedViewHolder[i].checkedIdx = i+1
+                            checkedViewHolder[i].checkView.text = (i+1).toString()
+                        }
+                        viewHolder.checkedIdx = 0
+                    }
+                    else if(checkedViewHolder.size < 10){
+                        checkedViewHolder.add(viewHolder)
+                        viewHolder.checkedIdx = checkedViewHolder.size
+                        viewHolder.checkView.text = viewHolder.checkedIdx.toString()
+                    }
+                }
+                else {
+                    checkedViewHolder.clear()
+                    checkedViewHolder.add(viewHolder)
+                }
             }
             try {
-                Glide.with(holder.itemView.context).asBitmap().load(file).into(object: CustomTarget<Bitmap>(){
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
-                    ) {
-                        if(imageSelected?.uri == images[position]) imageSelected?.bitmap = resource
-                        bitmap = resource
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {
-                        bitmap = null
-                    }
-                })
+                if(visible) {
+                    holder.checkView.visibility = VISIBLE
+                    holder.checkView.text = ""
+                }
+                else {
+                    holder.checkView.visibility = View.INVISIBLE
+                }
             } catch(e: Exception) {
                 Log.d(TAG,"convert to bitmap error: " + e.message)
             }
