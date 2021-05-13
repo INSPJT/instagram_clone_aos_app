@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri;
+import android.os.AsyncTask
 import android.provider.OpenableColumns;
 import android.util.Log
 import android.util.Pair;
@@ -33,6 +34,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import okhttp3.internal.wait
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -183,6 +185,8 @@ class DriverServiceHelper(private val driveService: Drive) {
 
 
 class GoogleServiceManager: InternetServiceClass{
+    override val baseUrl: String
+        get() = "https://drive.google.com/uc?export=view&id="
     private lateinit var driverServiceHelper: DriverServiceHelper
 
     override fun readFile(data: Any?,func:((Any?)->Unit)?): String {
@@ -228,16 +232,40 @@ class GoogleServiceManager: InternetServiceClass{
 
         var client = GoogleSignIn.getClient(compact, setGoogleSignInOption())
         if(func != null) func(client.signInIntent)
-//        compact.startActivityForResult(client.signInIntent, INTERNET_REQUEST.REQUEST_CODE_SIGN_IN)
+        compact.startActivityForResult(client.signInIntent, INTERNET_REQUEST.REQUEST_CODE_SIGN_IN)
     }
 
-    override fun createFile(data: Any?) {
-        val createData = data as GoogleServiceCreateData
-        driverServiceHelper.createFile(createData.name, createData.file).addOnSuccessListener {
-            Log.d(TAG, "create file - name : ${createData.name}, id: $it")
-        }.addOnFailureListener{
-            Log.d(TAG, "create file failed")
+    inner class FileProcessTask(var func:(url:ArrayList<String>)->Unit = {}) : AsyncTask<ArrayList<FileData>, ArrayList<FileData>, ArrayList<String>>(){
+        override fun doInBackground(vararg p0: ArrayList<FileData>?): ArrayList<String> {
+            var tasks = ArrayList<Task<String>>()
+            var urls = ArrayList<String>()
+            p0.forEach{p->
+                p?.forEach{data->
+                    tasks.add(driverServiceHelper.createFile(data.name, data.file).addOnSuccessListener {
+                        Log.d(TAG, "create file - name : ${data.name}, id: $it")
+                        urls.add("${InternetService.getBaseUrl()}$it")
+                    }.addOnFailureListener{
+                        Log.d(TAG, "create file failed")
+                    })
+                }
+            }
+            for(p in tasks) {
+                Tasks.await(p)
+            }
+            return urls
         }
+
+        override fun onPostExecute(result: ArrayList<String>?) {
+            super.onPostExecute(result)
+            Log.d(TAG, "task completed")
+            result?.let{func(result)}
+        }
+    }
+    override fun createFile(data: Any?) {
+        if(data !is GoogleServiceCreateData) throw IOException("Data Type invalid")
+        var fileList = data.files
+        var task = FileProcessTask(data.func)
+        task.execute(fileList)
     }
 
     private fun setGoogleSignInOption(): GoogleSignInOptions {
