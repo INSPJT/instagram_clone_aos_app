@@ -37,7 +37,7 @@ interface LoginRegister{
 }
 
 object InternetCommunication {
-    private const val url = "https://13.209.101.178"//https://yurivon.ml" // 접속 url"https://13.209.101.178"
+    private const val url = "https://codevpros.com"//https://yurivon.ml" // 접속 url"https://13.209.101.178"
     private val retrofitBuilder: Retrofit.Builder = Retrofit.Builder()
     private val retrofitScalarBuilder: Retrofit.Builder = Retrofit.Builder()
     private var retrofit: Retrofit? = null

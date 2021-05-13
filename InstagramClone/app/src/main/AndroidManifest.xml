@@ -21,15 +21,16 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".MainNavigationActivity">
         </activity>
-        <activity android:name=".LoginRegisterActivity"></activity>
-        <activity android:name=".LoginActivity">
-        </activity>
-        <activity android:name=".AddPhotoActivity">
+        <activity android:name=".LoginRegisterActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".LoginActivity">
+        </activity>
+        <activity android:name=".AddPhotoActivity">
         </activity>
         <activity android:name=".MainActivity" />
     </application>
