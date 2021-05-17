@@ -61,7 +61,6 @@ import kotlin.collections.ArrayList
 
 
 class AddPhotoActivity : AppCompatActivity() {
-    val TEMP_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMiIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE2MTk4NTk1MzR9.KlWL_IBoSRO89FgjFhqCPlLYG4D4qnSADBlqV6g0L1ADUet9oY8sGM13g_yQTPtSG9-vWvmjW7oh9BjNPRmk8Q"
     val TAG = "AddPhotoActivity"
     private val sdf = SimpleDateFormat("yyyy-MM-dd:HH:mm:ss.SSS")
 
@@ -122,7 +121,6 @@ class AddPhotoActivity : AppCompatActivity() {
         var retrofitService = retrofit.create(PostService::class.java)
 
         var service = retrofitService?.post(PostData("test", url))
-        var a =
 
         service?.enqueue(object: Callback<String>{
             override fun onFailure(call: Call<String>, t: Throwable) {
@@ -147,6 +145,7 @@ class AddPhotoActivity : AppCompatActivity() {
                 Log.d(TAG, "send uri to server $message")
             }
         })
+        Unit
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -156,7 +155,7 @@ class AddPhotoActivity : AppCompatActivity() {
         val imageList = getPathOfAllImages()
         addPhotoRecyclerView.adapter = UserFragmentRecyclerViewAdapter(imageList)
         addPhotoRecyclerView.layoutManager = GridLayoutManager(this, 3)
-        TokenManager.addTokenHeader(TEMP_TOKEN)
+        TokenManager.addTokenHeader(InternetService.TEMP_TOKEN)
 
         val googleService = GoogleServiceManager()
         InternetService.setInternetBase(googleService).init(GoogleServiceInitData(this)
