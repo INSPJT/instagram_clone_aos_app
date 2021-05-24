@@ -33,6 +33,25 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="50"></ImageView>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="vertical"
+       >
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/post_favorite"
+            android:src="@drawable/ic_favorite_border" />
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@id/post_favorite"
+            android:src="@drawable/ic_direct_message"/>
+    </RelativeLayout>
+
 
 
 </LinearLayout>

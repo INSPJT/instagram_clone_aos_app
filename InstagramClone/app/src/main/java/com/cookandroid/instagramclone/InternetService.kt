@@ -15,7 +15,7 @@ interface InternetServiceClass{
 }
 
 object InternetService {
-    val TEMP_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMiIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE2MjEyNzQxOTR9.X2hv6uPeepH0UshVaT4syUrvFQm2fDHG5cIGusQ8PsXpHwxZOMctM0YMRkUBMzt9RdCbhjFj8RazVn0li4wU4Q"
+    val TEMP_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMSIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE2MjE4NzM3NTB9.M5PeF3rR13_MfYavVxL8pIqF-gC2vfjU7-3H2u9fUQ1Xiyu3HfJWtYO-j0n-ODGYgKiXCehWrOqKyIa59zBENg"
     var internetBase: InternetServiceClass? = null
     fun createFile(data: Any? = null) {
         internetBase?.createFile(data)
