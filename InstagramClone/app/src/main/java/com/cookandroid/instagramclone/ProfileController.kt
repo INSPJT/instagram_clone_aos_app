@@ -1,5 +1,6 @@
 package com.cookandroid.instagramclone
 
+import android.graphics.Bitmap
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -21,3 +22,9 @@ interface ProfileController{
     ): Call<ArrayList<UserPostData>>
 }
 
+object MyProfile{
+    lateinit var userProfile: Bitmap
+    fun userProfileInitialized(): Boolean {
+        return this::userProfile.isInitialized
+    }
+}

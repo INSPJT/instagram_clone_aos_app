@@ -1,51 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="10"
     >
-    <androidx.appcompat.widget.Toolbar
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        >
-        <RelativeLayout
-            android:id="@+id/mainBar"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:src="@drawable/instagram_logo"></ImageView>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/my_activity"
-                    android:layout_width="30dp"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_favorite_border"></ImageView>
-
-                <ImageView
-                    android:id="@+id/instagram_dm"
-                    android:layout_width="35dp"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_chat_black"></ImageView>
-            </LinearLayout>
-        </RelativeLayout>
-    </androidx.appcompat.widget.Toolbar>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8"
+        android:layout_height="100dp"
+        android:id="@+id/profiles"
         >
         <LinearLayout
             android:layout_width="match_parent"
@@ -125,23 +87,13 @@
                         ></ImageView>
                 </LinearLayout>
             </HorizontalScrollView>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/main_navigation_recyclerView"
-                android:scrollbars="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
         </LinearLayout>
     </RelativeLayout>
-
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id = "@+id/bottom_navigation"
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_below="@id/profiles"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/main_navigation_recyclerView"
+        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:menu="@menu/bottom_navigation_main"
-        app:itemBackground="@color/colorPrimaryDark"
-        >
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
-
-</LinearLayout>
+        android:layout_height="match_parent"/>
+</RelativeLayout>

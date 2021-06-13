@@ -62,7 +62,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/register_bun"
+        android:id="@+id/register_btn"
         android:layout_marginBottom="100dp"
         android:layout_alignParentBottom="true"
         android:text="Register"/>

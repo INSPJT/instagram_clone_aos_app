@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -12,14 +13,28 @@ import java.util.concurrent.TimeUnit
 
 object InternetCommunication {
     private const val url = "https://codevpros.com"//https://yurivon.ml" // 접속 url"https://13.209.101.178"
+    var tokenInterceptor = object: Interceptor{
+        override fun intercept(chain: Interceptor.Chain): Response {
+            var request = if(InternetCommunication::token.isInitialized) {
+                chain.request().newBuilder().addHeader("Authorization", "Bearer $token").build()
+            }
+            else {
+                Log.e("token", "token is not initialized")
+                chain.request()
+            }
+            return chain.proceed(request)
+        }
+    }
     private val retrofitBuilder: Retrofit.Builder = Retrofit.Builder()
     private val retrofitScalarBuilder: Retrofit.Builder = Retrofit.Builder()
     private var retrofit: Retrofit? = null
     private var retrofitScalar : Retrofit? = null
     private var interceptor =  HttpLoggingInterceptor()
     private var okHttpClientBuilder = OkHttpClient.Builder()
-    private val loggerBuilder = okHttpClientBuilder.addInterceptor(interceptor).readTimeout(20, TimeUnit.SECONDS) .writeTimeout( 20, TimeUnit.SECONDS )
+    private val loggerBuilder = okHttpClientBuilder.addInterceptor(interceptor).addInterceptor(
+        tokenInterceptor).readTimeout(20, TimeUnit.SECONDS) .writeTimeout( 20, TimeUnit.SECONDS )
     private var logger = loggerBuilder.build()
+    lateinit var token: String
 
     init {
         Log.d("Init", "haha init")

@@ -42,11 +42,10 @@ import retrofit2.Response
 import java.io.File
 import java.io.IOException
 
-class GetUserPostActivity : AppCompatActivity() {
-    val f = Fragment()
+class GetUserPostActivity : Fragment() {
     val TAG = "get user Post"
     var userPostRecyclerViewAdapter = UserFragmentRecyclerViewAdapter()
-    inner class PostView(var view: View, var vp: ViewPager2): View(this@GetUserPostActivity) {
+    inner class PostView(var view: View, var vp: ViewPager2): View(activity) {
         lateinit var resources: ArrayList<Bitmap>
 
         constructor(resources: ArrayList<Bitmap>, view : View, vp: ViewPager2): this(view,vp){
@@ -65,17 +64,19 @@ class GetUserPostActivity : AppCompatActivity() {
         }.execute()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_get_user_post)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        var view = inflater.inflate(R.layout.activity_get_user_post,null)
 
-        //test
-        TokenManager.addTokenHeader(InternetService.TEMP_TOKEN)
-        //
-        user_post_recycler_view.adapter = userPostRecyclerViewAdapter
-        user_post_recycler_view.layoutManager = GridLayoutManager(this, 1)
+        var recyclerView = view.findViewById(R.id.user_post_recycler_view) as RecyclerView
+        recyclerView.adapter = userPostRecyclerViewAdapter
+        recyclerView.layoutManager = GridLayoutManager(activity, 1)
 
         GetUserPostsTask(0x7fffffff).execute()
+        return view
     }
 
     inner class UserFragmentRecyclerViewAdapter :
@@ -83,7 +84,7 @@ class GetUserPostActivity : AppCompatActivity() {
         var postData = ArrayList<View>()
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            var view = LayoutInflater.from(parent.context).inflate(R.layout.image_view_pager_fragment,parent, false)
+            var view = LayoutInflater.from(parent.context).inflate(R.layout.image_view_pager_fragment, parent, false)
             view.layoutParams = LinearLayoutCompat.LayoutParams(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)
             return PostViewHolder(view)
         }
@@ -169,7 +170,11 @@ class GetUserPostActivity : AppCompatActivity() {
                                 var urls = ArrayList<String>()
                                 post.mediaUrls.forEach { urls.add(it.url) }
                                 lastId = post.postId
-                                setPostDataView(post.postId, urls)
+                                try {
+                                    setPostDataView(post.postId, urls)
+                                } catch(e:Exception) {
+                                    Log.d(TAG, "set post data view failed")
+                                }
                             }
                             isEnd = true
                             "Success"
@@ -190,7 +195,7 @@ class GetUserPostActivity : AppCompatActivity() {
                     Log.d(TAG, message)
                 }
             })
-            while(!isEnd) Thread.sleep(500)
+            while(!isEnd) Thread.sleep(100)
         }
 
         override fun onPostExecute(result: Unit?) {
@@ -203,20 +208,27 @@ class GetUserPostActivity : AppCompatActivity() {
 
     inner class UrlProcess(var urls: ArrayList<String>, var func: (resources: ArrayList<Bitmap>)->Unit) : AsyncTask<Void, Void, Unit>(){
         var resources = ArrayList<Bitmap>()
+        var cnt = 0
         override fun doInBackground(vararg p0: Void?) {
             urls.forEach {
-                Glide.with(this@GetUserPostActivity).asBitmap().load(it)
-                    .into(object : SimpleTarget<Bitmap>() {
-                        override fun onResourceReady(
-                            resource: Bitmap,
-                            transition: Transition<in Bitmap>?
-                        ) {
-                            resources.add(resource)
-                            Log.d("func", "resource ready")
-                        }
-                    })
+                try {
+                    Glide.with(this@GetUserPostActivity).asBitmap().load(it)
+                        .into(object : SimpleTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                cnt++
+                                resources.add(resource)
+                                Log.d("func", "resource ready")
+                            }
+                        })
+                } catch(e:Exception){
+                    cnt++
+                    Log.d("url async", "failed - ${e.message}")
+                }
             }
-            while(urls.size != resources.size){
+            while(cnt != urls.size){
                 Thread.sleep(100)
                 Log.d("func", "sleep, ${urls.size} vs ${resources.size}")
             }
@@ -224,9 +236,11 @@ class GetUserPostActivity : AppCompatActivity() {
 
         override fun onPostExecute(result: Unit?) {
             super.onPostExecute(result)
-            func(resources)
-
-            Log.d("func","url async test")
+            try {
+                func(resources)
+            } catch(e:Exception){
+                Log.d("url async", "failed - ${e.message}")
+            }
         }
     }
 }

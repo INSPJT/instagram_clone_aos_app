@@ -18,7 +18,6 @@ import com.bumptech.glide.Glide.init
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.cookandroid.instagramclone.MainNavigationActivity.Companion.cont
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
@@ -58,15 +57,16 @@ class DriverServiceHelper(private val driveService: Drive) {
             googleFile.id
         })
     }
+    data class readFileData(val fileId: String, val cont: Context)
 
-    fun readFile(fileId: String): Task<Pair<String, String>> {
+    fun readFile(fileId: readFileData): Task<Pair<String, String>> {
         return Tasks.call(mExecutor, Callable {
-            val metadata = driveService.files().get(fileId).execute()
+            val metadata = driveService.files().get(fileId.fileId).execute()
             val name = metadata.name
 
             var res = Pair<String, String>("", "")
             try {
-                val inputStream = driveService.files().get(fileId).executeMediaAsInputStream()
+                val inputStream = driveService.files().get(fileId.fileId).executeMediaAsInputStream()
 //                var os = ByteArrayOutputStream()
 //                driveService.files().get(fileId).executeAndDownloadTo(os)
 //                var str = os.toString()
@@ -98,8 +98,8 @@ class DriverServiceHelper(private val driveService: Drive) {
                 }
                 val contents = stringBuilder.toString()
                 val byte = contents.toByteArray()
-                if(MainNavigationActivity.imageView != null && MainNavigationActivity.cont != null){
-                    Glide.with(cont!!)
+                if(MainNavigationActivity.imageView != null){
+                    Glide.with(fileId.cont)
                         .asBitmap()
                         .load(byte)
                         .into(object: CustomTarget<Bitmap>(){
@@ -195,7 +195,7 @@ class GoogleServiceManager: InternetServiceClass{
         }
 
         var res: String = ""
-        driverServiceHelper.readFile(data as String).addOnSuccessListener {
+        driverServiceHelper.readFile(data as DriverServiceHelper.readFileData).addOnSuccessListener {
             Log.d(TAG, "read file success name: ${it.first} content: ${it.second}")
             if(func!=null) func(it.second)
         }.addOnFailureListener {

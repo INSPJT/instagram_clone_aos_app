@@ -19,20 +19,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".GetUserPostActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name=".NavigationActivity">
         </activity>
-        <activity android:name=".MyProfileActivity">
+        <activity android:name=".GetUserPostActivity"></activity>
+        <activity android:name=".MyProfileActivity"></activity>
+        <activity android:name=".MainNavigationActivity">
         </activity>
-        <activity android:name=".MainNavigationActivity" />
         <activity android:name=".LoginRegisterActivity" />
-        <activity android:name=".LoginActivity"></activity>
-        <activity android:name=".AddPhotoActivity">
+        <activity android:name=".LoginActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".AddPhotoActivity"></activity>
+        <activity android:name=".MainActivity">
+        </activity>
     </application>
 
 </manifest>

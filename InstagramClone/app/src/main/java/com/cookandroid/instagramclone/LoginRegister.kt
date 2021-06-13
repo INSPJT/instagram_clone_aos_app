@@ -46,6 +46,7 @@ class LoginRegisterActivity : AppCompatActivity() {
                                 )
                                     .show()
                                 Log.d("성공", "성공")
+                                finish()
                             }
                             401 -> {//Unauthorized
                                 Toast.makeText(
