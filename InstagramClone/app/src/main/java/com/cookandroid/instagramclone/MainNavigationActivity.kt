@@ -29,10 +29,8 @@ import androidx.fragment.app.Fragment
 class MainNavigationActivity : Fragment() {
     val TAG = "MainNavigationActivity"
     var files = ArrayList<String>()
-//    var googleService: GoogleServiceManager? = null
     companion object{
         var imageView:ImageView ? = null
-//        var cont: Context? = null
     }
 
     var onFilesGet = {data:Any?->
@@ -46,7 +44,6 @@ class MainNavigationActivity : Fragment() {
                     Log.e("file get error", "${e.message}")
                 }
             }
-//        array.forEach{Log.d(TAG, "file id get id: " + it); Glide.with(this).load(googleImageUrl+it).into(myProfile)}
         }
         Unit
     }
@@ -56,30 +53,10 @@ class MainNavigationActivity : Fragment() {
         Unit
     }
 
-//    var onLoginHandle = {
-//        InternetService.fileList(func = onFilesGet)
-//        Unit
-//    }
-
-//    var onLoginSuccess = {intent: Any?->
-//        startActivityForResult(intent as Intent, INTERNET_REQUEST.REQUEST_CODE_SIGN_IN)
-//    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = LayoutInflater.from(activity).inflate(R.layout.activity_main_navigation, container, false)
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_main_navigation)
         imageView = myProfile
-//        cont = this
 
-        try {
-//            googleService = GoogleServiceManager()
-//            InternetService.setInternetBase(googleService!!)
-//            InternetService.asGoogleServiceManager()
-//                .init(GoogleServiceInitData(cont as AppCompatActivity){_:Int,_:Int,_:Intent?-> return@GoogleServiceInitData},onLoginSuccess)
-        } catch(e: Exception){
-            Log.d(TAG, e.message)
-        }
         if(MyProfile.userProfileInitialized()){
             imageView?.setImageBitmap(MyProfile.userProfile)
             Log.e(TAG, "initialized")
@@ -89,28 +66,6 @@ class MainNavigationActivity : Fragment() {
         }
         return view
     }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        activity?.let {
-//            when (requestCode) {
-//                INTERNET_REQUEST.REQUEST_CODE_SIGN_IN -> {
-//                    if (resultCode == Activity.RESULT_OK && data != null) {
-//                        InternetService.asGoogleServiceManager()
-//                            .handleSignInResult(it, data, onLoginHandle)
-//                    }
-//                }
-//                INTERNET_REQUEST.REQUEST_CODE_OPEN_DOCUMENT -> {
-//                    if (resultCode == Activity.RESULT_OK && data != null) {
-//                        val uri = data.data
-//                        if (uri != null) {
-//                            InternetService.asGoogleServiceManager()?.openFIleFromFilePicker(it, uri)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        super.onActivityResult(requestCode, resultCode, data)
-//    }
 
     inner class UserFragmentRecyclerViewAdapter(private var images: ArrayList<String>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {

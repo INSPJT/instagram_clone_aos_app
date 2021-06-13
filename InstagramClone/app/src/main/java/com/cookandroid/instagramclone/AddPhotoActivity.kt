@@ -186,11 +186,6 @@ class AddPhotoActivity : Fragment() {
                     } ?: throw(IOException("image file is null"))
                 }
                 InternetService.createFile(GoogleServiceCreateData(fileList,sendUrlToServer))
-    //            {urls:ArrayList<String>->
-    //                var str = ""
-    //                urls.forEach{str += "\n$it" }
-    //                Log.d(TAG,"complete tasks\n$str")
-    //            })
             }
         }
         return view
