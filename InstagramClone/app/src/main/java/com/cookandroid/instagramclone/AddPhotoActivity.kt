@@ -46,8 +46,8 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
-import kotlinx.android.synthetic.main.activity_add_photo.*
-import kotlinx.android.synthetic.main.activity_add_photo.view.*
+//import kotlinx.android.synthetic.main.activity_add_photo.*
+//import kotlinx.android.synthetic.main.activity_add_photo.view.*
 import kotlinx.android.synthetic.main.add_viewholder.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -60,8 +60,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class AddPhotoActivity : AppCompatActivity() {
-    val TEMP_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMiIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE2MTk4NTk1MzR9.KlWL_IBoSRO89FgjFhqCPlLYG4D4qnSADBlqV6g0L1ADUet9oY8sGM13g_yQTPtSG9-vWvmjW7oh9BjNPRmk8Q"
+class AddPhotoActivity : Fragment() {
+    lateinit var selected_image: ImageView
     val TAG = "AddPhotoActivity"
     private val sdf = SimpleDateFormat("yyyy-MM-dd:HH:mm:ss.SSS")
 
@@ -81,7 +81,7 @@ class AddPhotoActivity : AppCompatActivity() {
         var result: ArrayList<String> = ArrayList()
         var uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
-        val cursor = contentResolver.query(
+        val cursor = activity?.contentResolver?.query(
             uri,
             null,
             null,
@@ -97,112 +97,98 @@ class AddPhotoActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        var writePermission =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        var readPermission =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-        var cameraPermission =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        if (writePermission == PackageManager.PERMISSION_DENIED || readPermission == PackageManager.PERMISSION_DENIED || cameraPermission == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.CAMERA
-                ),
-                100
-            )
+        activity?.let{
+            var writePermission =
+                ContextCompat.checkSelfPermission(it, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            var readPermission =
+                ContextCompat.checkSelfPermission(it, Manifest.permission.READ_EXTERNAL_STORAGE)
+            var cameraPermission =
+                ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA)
+            if (writePermission == PackageManager.PERMISSION_DENIED || readPermission == PackageManager.PERMISSION_DENIED || cameraPermission == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(
+                    it,
+                    arrayOf(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA
+                    ),
+                    100
+                )
+            }
         }
     }
 
     var sendUrlToServer = {url:ArrayList<String> ->
-        Log.d(TAG, "send url to server")
-        var retrofit = InternetCommunication.getRetrofitString()
-        var retrofitService = retrofit.create(PostService::class.java)
+        activity?.let {
+            Log.d(TAG, "send url to server")
+            var retrofit = InternetCommunication.getRetrofitString()
+            var retrofitService = retrofit.create(PostService::class.java)
 
-        var service = retrofitService?.post(PostData("test", url))
-        var a =
+            var service = retrofitService?.post(PostData("test", url))
 
-        service?.enqueue(object: Callback<String>{
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.d(TAG, "fail ${t.message}")
-            }
-
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                var message:String = when(response.code()){
-                    200-> {
-                        Toast.makeText(
-                            this@AddPhotoActivity,
-                            "${response.body().toString()}",
-                            Toast.LENGTH_LONG
-                        )
-                        "Sucess"
-                    }
-                    401-> "Unauthorized"
-                    403-> "Forbidden"
-                    404-> "Not Found"
-                    else-> "Failed"
+            service?.enqueue(object: Callback<String>{
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    Log.d(TAG, "fail ${t.message}")
                 }
-                Log.d(TAG, "send uri to server $message")
-            }
-        })
+
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+                    var message:String = when(response.code()){
+                        200-> {
+                            Toast.makeText(
+                                it,
+                                "${response.body().toString()}",
+                                Toast.LENGTH_LONG
+                            )
+                            "Sucess"
+                        }
+                        401-> "Unauthorized"
+                        403-> "Forbidden"
+                        404-> "Not Found"
+                        else-> "Failed"
+                    }
+                    Log.d(TAG, "send uri to server $message")
+                }
+            })
+        }
+        Unit
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_photo)
-        checkPermissions()
-        val imageList = getPathOfAllImages()
-        addPhotoRecyclerView.adapter = UserFragmentRecyclerViewAdapter(imageList)
-        addPhotoRecyclerView.layoutManager = GridLayoutManager(this, 3)
-        TokenManager.addTokenHeader(TEMP_TOKEN)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        var view = inflater.inflate(R.layout.activity_add_photo,null)
+        activity?.let{
+            checkPermissions()
+            val imageList = getPathOfAllImages()
+            var recyclerView = view.findViewById<RecyclerView>(R.id.addPhotoRecyclerView)
+            var multiButton = view.findViewById<ImageView>(R.id.multiClickBtn)
+            var add_photo_btn = view.findViewById<Button>(R.id.add_photo_btn)
+            recyclerView.adapter = UserFragmentRecyclerViewAdapter(imageList)
+            recyclerView.layoutManager = GridLayoutManager(it, 3)
+            selected_image = view.findViewById(R.id.selected_image)
 
-        val googleService = GoogleServiceManager()
-        InternetService.setInternetBase(googleService).init(GoogleServiceInitData(this)
-            {requestCode: Int, resultCode: Int, data: Intent? ->
-                when (requestCode) {
-                    INTERNET_REQUEST.REQUEST_CODE_SIGN_IN -> {
-                        if (resultCode == Activity.RESULT_OK && data != null) {
-                            InternetService.asGoogleServiceManager()
-                                .handleSignInResult(this, data)
-                        }
-                    }
-                    INTERNET_REQUEST.REQUEST_CODE_OPEN_DOCUMENT -> {
-                        if (resultCode == Activity.RESULT_OK && data != null) {
-                            val uri = data.data
-                            if (uri != null) {
-                                googleService.openFIleFromFilePicker(this, uri)
-                            }
-                        }
-                    }
+            multiButton.setOnClickListener {
+                var adapter = recyclerView.adapter as UserFragmentRecyclerViewAdapter
+                adapter.checkedViewHolder.clear()
+                adapter.notifyDataSetChanged()
+                adapter.visible = !adapter.visible
+            }
+
+            add_photo_btn.setOnClickListener{
+                var imageSelected = (recyclerView.adapter as UserFragmentRecyclerViewAdapter).checkedViewHolder
+                var fileList = ArrayList<FileData>()
+                imageSelected.forEach{ it2 ->
+                    it2.imageData?.let{
+                        var name = sdf.format(Date())
+                        fileList.add(FileData(name, it.file))
+                    } ?: throw(IOException("image file is null"))
                 }
+                InternetService.createFile(GoogleServiceCreateData(fileList,sendUrlToServer))
             }
-        )
-
-        multiClickBtn.setOnClickListener {
-            var adapter = addPhotoRecyclerView.adapter as UserFragmentRecyclerViewAdapter
-            adapter.checkedViewHolder.clear()
-            adapter.notifyDataSetChanged()
-            adapter.visible = !adapter.visible
         }
-
-        add_photo_btn.setOnClickListener{
-            var imageSelected = (addPhotoRecyclerView.adapter as UserFragmentRecyclerViewAdapter).checkedViewHolder
-            var fileList = ArrayList<FileData>()
-            imageSelected.forEach{ it2 ->
-                it2.imageData?.let{
-                    var name = sdf.format(Date())
-                    fileList.add(FileData(name, it.file))
-                } ?: throw(IOException("image file is null"))
-            }
-            InternetService.createFile(GoogleServiceCreateData(fileList,sendUrlToServer))
-//            {urls:ArrayList<String>->
-//                var str = ""
-//                urls.forEach{str += "\n$it" }
-//                Log.d(TAG,"complete tasks\n$str")
-//            })
-        }
+        return view
     }
 
     inner class UserFragmentRecyclerViewAdapter(private var images: ArrayList<String>) :

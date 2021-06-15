@@ -2,6 +2,7 @@ package com.cookandroid.instagramclone
 
 import android.content.Intent
 import java.io.IOException
+import java.util.*
 
 interface InternetServiceClass{
     val baseUrl: String
@@ -14,6 +15,7 @@ interface InternetServiceClass{
 }
 
 object InternetService {
+    var userToken  = ""
     var internetBase: InternetServiceClass? = null
     fun createFile(data: Any? = null) {
         internetBase?.createFile(data)

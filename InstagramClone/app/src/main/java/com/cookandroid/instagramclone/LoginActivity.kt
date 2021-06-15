@@ -43,6 +43,7 @@ class LoginActivity : AppCompatActivity() {
                                     val accesstokenexpirein = response.body()!!.accessTokenExpiresIn
                                     val granttype = response.body()!!.grantType
                                     val refreshtoken = response.body()!!.refreshToken
+                                    accesstoken?.let{InternetCommunication.token = it}
 
                                     val user = User(
                                         text_email,
@@ -60,9 +61,9 @@ class LoginActivity : AppCompatActivity() {
                                     Log.d("성공", "성공")
 
                                     val intent =
-                                        Intent(this@LoginActivity, MainActivity::class.java)
+                                        Intent(this@LoginActivity, NavigationActivity::class.java)
                                     intent.putExtra("user", user)
-//                            startActivity(intent)
+                                    startActivity(intent)
                                 }
                                 401 -> { // 로그인 실패
                                     Toast.makeText(
@@ -91,6 +92,11 @@ class LoginActivity : AppCompatActivity() {
                 catch(e:Exception){
                     Log.d("버튼 오류", e.message)
                 }
+        }
+
+        register_btn.setOnClickListener{
+            val intent = Intent(this@LoginActivity, LoginRegisterActivity::class.java)
+            startActivity(intent)
         }
     }
 }
