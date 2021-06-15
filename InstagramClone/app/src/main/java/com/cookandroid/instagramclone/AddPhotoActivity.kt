@@ -132,7 +132,7 @@ class AddPhotoActivity : Fragment() {
                 }
 
                 override fun onResponse(call: Call<String>, response: Response<String>) {
-                    var message:String = when(response.code()){
+                    var message:String = when(response.code()) {
                         200-> {
                             Toast.makeText(
                                 it,
