@@ -15,11 +15,18 @@ interface ProfileController{
 
     @Headers("accpet: text/plain",
         "content-type: application/json")
-    @GET("/member/{displayId}/posts")
+    @GET("/members/{displayId}/posts")
     fun getUserPosts(
-        @Query("displayId") displayId: String,
+        @Path("displayId") displayId: String,
         @Query("lastPostId") lastPostId: Int
     ): Call<ArrayList<UserPostData>>
+
+    @Headers("accpet: text/plain",
+        "content-type: application/json")
+    @GET("/members/{displayId}/profiles")
+    fun getUserProfile(
+        @Path("displayId") displayId: String
+    ): Call<ProfileResponse>
 }
 
 object MyProfile{
@@ -28,3 +35,4 @@ object MyProfile{
         return this::userProfile.isInitialized
     }
 }
+

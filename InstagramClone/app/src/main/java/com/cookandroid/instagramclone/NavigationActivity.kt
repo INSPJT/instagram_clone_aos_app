@@ -64,21 +64,19 @@ class NavigationActivity : AppCompatActivity(), BottomNavigationView.OnNavigatio
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
             var fragment: Fragment? = when(item.itemId){
                 R.id.action_home ->{
-                    Toast.makeText(this, "click home",Toast.LENGTH_LONG).show()
                     MainNavigationActivity()
                 }
                 R.id.action_favorate ->{
                     null
                 }
                 R.id.action_account -> {
-                    Toast.makeText(this, "click account",Toast.LENGTH_LONG).show()
                     GetUserPostActivity()
                 }
                 R.id.action_photo -> {
                     AddPhotoActivity()
                 }
                 R.id.action_search -> {
-                    null
+                    SearchFragment()
                 }
                 else ->null
             }
