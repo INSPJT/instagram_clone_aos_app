@@ -62,7 +62,7 @@ class NavigationActivity : AppCompatActivity(), BottomNavigationView.OnNavigatio
         Unit
     }
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-            var fragment: Fragment? = when(item.itemId){
+        var fragment: Fragment? = when(item.itemId){
                 R.id.action_home ->{
                     MainNavigationActivity()
                 }
@@ -94,27 +94,29 @@ class NavigationActivity : AppCompatActivity(), BottomNavigationView.OnNavigatio
         var user = intent.getParcelableExtra<User>("user")
 
         user?.accessToken?.let{ InternetService.userToken = user.accessToken!!}
-        val googleService = GoogleServiceManager()
-        InternetService.setInternetBase(googleService).init(GoogleServiceInitData(this)
-            {requestCode: Int, resultCode: Int, data: Intent? ->
-                when (requestCode) {
-                    INTERNET_REQUEST.REQUEST_CODE_SIGN_IN -> {
-                        if (resultCode == Activity.RESULT_OK && data != null) {
-                            InternetService.asGoogleServiceManager()
-                                .handleSignInResult(this, data, getMyProfile)
-                        }
-                    }
-                    INTERNET_REQUEST.REQUEST_CODE_OPEN_DOCUMENT -> {
-                        if (resultCode == Activity.RESULT_OK && data != null) {
-                            val uri = data.data
-                            if (uri != null) {
-                                googleService.openFIleFromFilePicker(this, uri)
-                            }
-                        }
-                    }
-                }
-            }
-        )
+        val retrofitService = RetrofitImageService("", "retrofit manager")
+//        val googleService = GoogleServiceManager()
+        InternetService.setInternetBase(retrofitService)
+//        InternetService.setInternetBase(googleService).init(GoogleServiceInitData(this)
+//            {requestCode: Int, resultCode: Int, data: Intent? ->
+//                when (requestCode) {
+//                    INTERNET_REQUEST.REQUEST_CODE_SIGN_IN -> {
+//                        if (resultCode == Activity.RESULT_OK && data != null) {
+//                            InternetService.asGoogleServiceManager()
+//                                .handleSignInResult(this, data, getMyProfile)
+//                        }
+//                    }
+//                    INTERNET_REQUEST.REQUEST_CODE_OPEN_DOCUMENT -> {
+//                        if (resultCode == Activity.RESULT_OK && data != null) {
+//                            val uri = data.data
+//                            if (uri != null) {
+//                                googleService.openFIleFromFilePicker(this, uri)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        )
 
         Toast.makeText(this, "${InternetService.userToken}",Toast.LENGTH_LONG).show()
         bottom_navigation.setOnNavigationItemSelectedListener(this)

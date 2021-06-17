@@ -75,7 +75,10 @@ class GetUserPostActivity : Fragment() {
         recyclerView.adapter = userPostRecyclerViewAdapter
         recyclerView.layoutManager = GridLayoutManager(activity, 1)
 
-        GetUserPostsTask(0x7fffffff).execute()
+        var name = arguments?.let{it.getString("name")?.let {name->name
+        }?: ""}?: ""
+        GetUserPostsTask(0x7fffffff, name).execute()
+
         return view
     }
 
