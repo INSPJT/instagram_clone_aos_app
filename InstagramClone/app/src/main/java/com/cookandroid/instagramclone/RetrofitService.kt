@@ -91,7 +91,6 @@ class RetrofitImageService(override val baseUrl: String, override val TAG: Strin
         override fun doInBackground(vararg p0: Void?) {
             var cnt = 0
             var urls = ArrayList<String>()
-            var descBody = "formData".toRequestBody("text/plain".toMediaTypeOrNull())
             files.forEach {
                 var service = retrofitService.sendImage(FormDataUtil.getImageBody("file", it.file))
 
@@ -123,7 +122,6 @@ class RetrofitImageService(override val baseUrl: String, override val TAG: Strin
         }
     }
 
-    private val sdf = SimpleDateFormat("yyyy-MM-dd:HH:mm:ss.SSS")
     override fun createFile(data: Any?) {
         var (files, func)  = data as GoogleServiceCreateData
         ImageProcessWait(files, func).execute()
