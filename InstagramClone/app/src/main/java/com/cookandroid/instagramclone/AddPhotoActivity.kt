@@ -176,7 +176,7 @@ class AddPhotoActivity : Fragment() {
                 adapter.visible = !adapter.visible
             }
 
-            add_photo_btn.setOnClickListener{
+            add_photo_btn.setOnClickListener {
                 var imageSelected = (recyclerView.adapter as UserFragmentRecyclerViewAdapter).checkedViewHolder
                 var fileList = ArrayList<FileData>()
                 imageSelected.forEach{ it2 ->

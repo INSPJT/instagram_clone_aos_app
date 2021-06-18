@@ -73,7 +73,7 @@ class SearchPeopleFragment : Fragment() {
             return UserFindResultViewHolder(view)
         }
 
-        inner class UserFindResultViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        inner class UserFindResultViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             var displayIdTextView = view.findViewById<TextView>(R.id.profile_displayed_id)
             var IdTextView = view.findViewById<TextView>(R.id.profile_id)
             var profileImage = view.findViewById<ImageView>(R.id.user_find_profile_img)
@@ -84,8 +84,15 @@ class SearchPeopleFragment : Fragment() {
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             var holder = holder as UserFindResultViewHolder
+            var name = usersList[position].memberDto?.nickname ?: ""
             holder.displayIdTextView.text = usersList[position].memberDto?.nickname
             holder.IdTextView.text = usersList[position].memberDto?.displayId
+            holder.view.setOnClickListener{
+                var bundle = Bundle(1)
+                bundle.putString("name", name)
+                var fragment = GetUserPostActivity()
+//                childFragmentManager.beginTransaction().replace()
+            }
         }
 
         override fun getItemCount(): Int {

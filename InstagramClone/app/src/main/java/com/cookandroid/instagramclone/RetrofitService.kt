@@ -1,14 +1,21 @@
 package com.cookandroid.instagramclone
 
+import android.os.AsyncTask
 import android.util.Log
 import com.google.gson.GsonBuilder
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Response
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import retrofit2.create
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 object InternetCommunication {
@@ -74,6 +81,65 @@ object InternetCommunication {
     fun getRetrofitString(): Retrofit {
         if(retrofitScalar == null) makeRetrofitScalar()
         return retrofitScalar!!
+    }
+}
+
+class RetrofitImageService(override val baseUrl: String, override val TAG: String) : InternetServiceClass {
+    var retrofit = InternetCommunication.getRetrofitString()
+    var retrofitService = retrofit.create(ImageService::class.java)
+    inner class ImageProcessWait(var files: ArrayList<FileData>, val func: (resources:ArrayList<String>) -> Unit) : AsyncTask<Void,Void,Unit>(){
+        override fun doInBackground(vararg p0: Void?) {
+            var cnt = 0
+            var urls = ArrayList<String>()
+            files.forEach {
+                var service = retrofitService.sendImage(FormDataUtil.getImageBody("file", it.file))
+
+                service?.enqueue(object: Callback<String> {
+                    override fun onFailure(call: Call<String>, t: Throwable) {
+                        Log.e(TAG, t.message)
+                        cnt++
+                    }
+
+                    override fun onResponse(call: Call<String>, response: retrofit2.Response<String>) {
+                        cnt++
+                        val message = when(response.code()) {
+                            200-> {
+                                Log.e(TAG, "url : ${response.body()}")
+                                response.body()?.let{url-> urls.add(url)}
+                                "Sucess"
+                            }
+                            else -> "Unknown error"
+                        }
+                        Log.e(TAG,message)
+                    }
+                })
+            }
+            while(cnt != files.size) Thread.sleep(100)
+            if(urls.size == files.size) func(urls)
+            else{
+                Log.d(TAG, "some send image url was failed")
+            }
+        }
+    }
+
+    override fun createFile(data: Any?) {
+        var (files, func)  = data as GoogleServiceCreateData
+        ImageProcessWait(files, func).execute()
+        Log.d(TAG,"create file")
+    }
+
+    override fun init(data: Any?, func: ((Any?) -> Unit)?) {
+    }
+
+    override fun handlePermission(data: Any?) {
+    }
+
+    override fun fileList(data: Any?, func: ((Any?) -> Unit)?): ArrayList<String> {
+        return ArrayList()
+    }
+
+    override fun readFile(data: Any?, func: ((Any?) -> Unit)?): String {
+        return ""
     }
 }
 
