@@ -185,7 +185,7 @@ class AddPhotoActivity : Fragment() {
                         fileList.add(FileData(name, it.file))
                     } ?: throw(IOException("image file is null"))
                 }
-                InternetService.createFile(GoogleServiceCreateData(fileList,sendUrlToServer))
+                InternetService.createFile(SendFileData(fileList,sendUrlToServer))
             }
         }
         return view

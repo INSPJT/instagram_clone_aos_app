@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -32,7 +33,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [SearchPeopleFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class SearchPeopleFragment : Fragment() {
+class SearchPeopleFragment(var parentFragmentManager: FragmentManager) : Fragment() {
     val TAG = "serach fragment"
     var usersList = ArrayList<ProfileResponse>()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,7 +78,17 @@ class SearchPeopleFragment : Fragment() {
             var displayIdTextView = view.findViewById<TextView>(R.id.profile_displayed_id)
             var IdTextView = view.findViewById<TextView>(R.id.profile_id)
             var profileImage = view.findViewById<ImageView>(R.id.user_find_profile_img)
+            var fragment = UserProfileFragment()
             init{
+                view.setOnClickListener {
+                    activity?.let{
+                        it.supportFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.main_content, fragment)
+                            .addToBackStack(null)
+                            .commit()
+                    }
+                }
                 profileImage.setImageResource(R.drawable.ic_account)
             }
         }
@@ -87,12 +98,6 @@ class SearchPeopleFragment : Fragment() {
             var name = usersList[position].memberDto?.nickname ?: ""
             holder.displayIdTextView.text = usersList[position].memberDto?.nickname
             holder.IdTextView.text = usersList[position].memberDto?.displayId
-            holder.view.setOnClickListener{
-                var bundle = Bundle(1)
-                bundle.putString("name", name)
-                var fragment = GetUserPostActivity()
-//                childFragmentManager.beginTransaction().replace()
-            }
         }
 
         override fun getItemCount(): Int {

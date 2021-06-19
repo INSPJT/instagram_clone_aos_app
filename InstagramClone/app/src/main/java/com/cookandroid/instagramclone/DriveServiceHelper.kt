@@ -262,7 +262,7 @@ class GoogleServiceManager: InternetServiceClass{
         }
     }
     override fun createFile(data: Any?) {
-        if(data !is GoogleServiceCreateData) throw IOException("Data Type invalid")
+        if(data !is SendFileData) throw IOException("Data Type invalid")
         var fileList = data.files
         var task = FileProcessTask(data.func)
         task.execute(fileList)

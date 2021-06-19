@@ -36,3 +36,11 @@ object MyProfile{
     }
 }
 
+object ProfileInformation {
+    fun getPosts(id: String): ArrayList<String> {
+        var res = ArrayList<String>()
+
+
+        return res
+    }
+}
