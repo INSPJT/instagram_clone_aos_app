@@ -87,7 +87,7 @@ class SearchFragment : Fragment() {
                                         var usersList = ArrayList<ProfileResponse>()
                                         usersList.add(m)
                                         bundle.putParcelableArrayList("user", usersList)
-                                        var fragment = SearchPeopleFragment(childFragmentManager)
+                                        var fragment = SearchPeopleFragment()
                                         fragment.arguments = bundle
 
                                         childFragmentManager.beginTransaction().replace(R.id.search_result, fragment).commit()
@@ -96,7 +96,7 @@ class SearchFragment : Fragment() {
                                 }
                                 else-> {
                                     Log.e(TAG, response.body().toString())
-                                    var fragment = SearchPeopleFragment(childFragmentManager)
+                                    var fragment = SearchPeopleFragment()
 
                                     childFragmentManager.beginTransaction().replace(R.id.search_result, fragment).commit()
                                     "unknown error"

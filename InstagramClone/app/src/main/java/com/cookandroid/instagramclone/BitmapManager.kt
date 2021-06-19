@@ -23,10 +23,7 @@ object BitmapManager{
         bitmapHash[url]?.let{
             call.onSuccess(it)
         }
-            ?:{
-                BitmapProcess(url, con, call).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-                Unit
-            }()
+            ?: BitmapProcess(url, con, call).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     fun getBitmapFromUrl(urls: ArrayList<String>, con: View, call: OnResponse<Bitmap>) {

@@ -33,7 +33,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [SearchPeopleFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class SearchPeopleFragment(var parentFragmentManager: FragmentManager) : Fragment() {
+class SearchPeopleFragment : Fragment() {
     val TAG = "serach fragment"
     var usersList = ArrayList<ProfileResponse>()
     override fun onCreate(savedInstanceState: Bundle?) {

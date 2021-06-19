@@ -29,18 +29,3 @@ interface ProfileController{
     ): Call<ProfileResponse>
 }
 
-object MyProfile{
-    lateinit var userProfile: Bitmap
-    fun userProfileInitialized(): Boolean {
-        return this::userProfile.isInitialized
-    }
-}
-
-object ProfileInformation {
-    fun getPosts(id: String): ArrayList<String> {
-        var res = ArrayList<String>()
-
-
-        return res
-    }
-}
