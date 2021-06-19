@@ -57,13 +57,6 @@ class MainNavigationActivity : Fragment() {
         var view = LayoutInflater.from(activity).inflate(R.layout.activity_main_navigation, container, false)
         imageView = myProfile
 
-        if(MyProfile.userProfileInitialized()){
-            imageView?.setImageBitmap(MyProfile.userProfile)
-            Log.e(TAG, "initialized")
-        }
-        else{
-            Log.e(TAG, "not initialized")
-        }
         return view
     }
 
