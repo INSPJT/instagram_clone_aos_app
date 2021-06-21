@@ -67,27 +67,6 @@ class DriverServiceHelper(private val driveService: Drive) {
             var res = Pair<String, String>("", "")
             try {
                 val inputStream = driveService.files().get(fileId.fileId).executeMediaAsInputStream()
-//                var os = ByteArrayOutputStream()
-//                driveService.files().get(fileId).executeAndDownloadTo(os)
-//                var str = os.toString()
-//                Log.d(TAG, str)
-//                if(MainNavigationActivity.imageView != null && MainNavigationActivity.cont != null){
-//                    Glide.with(cont!!)
-//                        .asBitmap()
-//                        .load(os.toByteArray())
-//                        .into(object: CustomTarget<Bitmap>(){
-//                            override fun onLoadCleared(placeholder: Drawable?) {
-//                            }
-//
-//                            override fun onResourceReady(
-//                                resource: Bitmap,
-//                                transition: Transition<in Bitmap>?
-//                            ) {
-//                                MainNavigationActivity.imageView!!.setImageBitmap(resource)
-//                            }
-//
-//                        })
-//                }
 
                 val reader = BufferedReader(InputStreamReader(inputStream))
                 var stringBuilder = StringBuilder()
@@ -262,7 +241,7 @@ class GoogleServiceManager: InternetServiceClass{
         }
     }
     override fun createFile(data: Any?) {
-        if(data !is GoogleServiceCreateData) throw IOException("Data Type invalid")
+        if(data !is SendFileData) throw IOException("Data Type invalid")
         var fileList = data.files
         var task = FileProcessTask(data.func)
         task.execute(fileList)
@@ -289,12 +268,6 @@ class GoogleServiceManager: InternetServiceClass{
                 driverServiceHelper = DriverServiceHelper(googleDriverService)
                 if(caller != null) caller()
 
-//                var fileList = InternetService.fileList{
-//
-//                }
-//                var content = ArrayList<String>()
-//                fileList.forEach { content.add(InternetService.readFile(it)); Log.d(TAG,it) }
-//                content.forEach { Log.d(TAG, it) }
             }
             .addOnFailureListener{
                     exception -> Log.e(TAG,"Unable to sign in.",exception)

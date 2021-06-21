@@ -49,6 +49,7 @@ class SearchFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
         var searchView = view.findViewById<SearchView>(R.id.search_bar)
+
         searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 p0?.let {findId->
@@ -89,7 +90,7 @@ class SearchFragment : Fragment() {
                                         var fragment = SearchPeopleFragment()
                                         fragment.arguments = bundle
 
-                                        childFragmentManager.beginTransaction()?.replace(R.id.search_result, fragment)?.commit()
+                                        childFragmentManager.beginTransaction().replace(R.id.search_result, fragment).commit()
                                     }
                                     "Success"
                                 }
@@ -97,7 +98,7 @@ class SearchFragment : Fragment() {
                                     Log.e(TAG, response.body().toString())
                                     var fragment = SearchPeopleFragment()
 
-                                    childFragmentManager.beginTransaction()?.replace(R.id.search_result, fragment)?.commit()
+                                    childFragmentManager.beginTransaction().replace(R.id.search_result, fragment).commit()
                                     "unknown error"
                                 }
                             }

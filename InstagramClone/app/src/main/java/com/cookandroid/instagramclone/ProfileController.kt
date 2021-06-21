@@ -29,10 +29,3 @@ interface ProfileController{
     ): Call<ProfileResponse>
 }
 
-object MyProfile{
-    lateinit var userProfile: Bitmap
-    fun userProfileInitialized(): Boolean {
-        return this::userProfile.isInitialized
-    }
-}
-

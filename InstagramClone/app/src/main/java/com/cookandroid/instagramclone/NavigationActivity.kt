@@ -41,7 +41,10 @@ class NavigationActivity : AppCompatActivity(), BottomNavigationView.OnNavigatio
                 else ->null
             }
         return fragment?.let{
-            supportFragmentManager.beginTransaction().replace(R.id.main_content, fragment).commit()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.main_content, fragment)
+                .addToBackStack(null)
+                .commit()
             true
         } ?: false
     }

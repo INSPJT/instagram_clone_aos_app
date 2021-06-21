@@ -19,7 +19,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 object InternetCommunication {
-    private const val url = "https://codevpros.com"//https://yurivon.ml" // 접속 url"https://13.209.101.178"
+    private const val url = "https://codevpros.com"
     var tokenInterceptor = object: Interceptor{
         override fun intercept(chain: Interceptor.Chain): Response {
             var request = if(InternetCommunication::token.isInitialized) {
@@ -123,7 +123,7 @@ class RetrofitImageService(override val baseUrl: String, override val TAG: Strin
     }
 
     override fun createFile(data: Any?) {
-        var (files, func)  = data as GoogleServiceCreateData
+        var (files, func)  = data as SendFileData
         ImageProcessWait(files, func).execute()
         Log.d(TAG,"create file")
     }
