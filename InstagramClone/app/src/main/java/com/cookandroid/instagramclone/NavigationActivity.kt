@@ -22,11 +22,12 @@ import kotlinx.android.synthetic.main.main_navigation.*
 
 class NavigationActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        var fragment: Fragment? = when(item.itemId){
-                R.id.action_home ->{
+        try {
+            var fragment: Fragment? = when (item.itemId) {
+                R.id.action_home -> {
                     MainNavigationActivity()
                 }
-                R.id.action_favorate ->{
+                R.id.action_favorate -> {
                     null
                 }
                 R.id.action_account -> {
@@ -38,15 +39,19 @@ class NavigationActivity : AppCompatActivity(), BottomNavigationView.OnNavigatio
                 R.id.action_search -> {
                     SearchFragment()
                 }
-                else ->null
+                else -> null
             }
-        return fragment?.let{
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.main_content, fragment)
-                .addToBackStack(null)
-                .commit()
-            true
-        } ?: false
+            return fragment?.let {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_content, fragment)
+                    .addToBackStack(null)
+                    .commit()
+                true
+            } ?: false
+        } catch (e: Exception) {
+            Log.e("SD", "navigation failed ${e.message}")
+        }
+        return false
     }
 
     val TAG = "navigation"

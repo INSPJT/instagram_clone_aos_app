@@ -19,9 +19,9 @@ data class CommentView(
 )
 
 data class Author(
-    var displayId: String,
-    var isFollowedByMe: Boolean,
-    var profileImageUrl: String?
+    var displayId: String = "",
+    var isFollowedByMe: Boolean =false,
+    var profileImageUrl: String? = null
 )
 
 data class GetPostData(
@@ -30,11 +30,34 @@ data class GetPostData(
     var createdAt: String,
     var modifiedAt: String,
     var isLike: Boolean,
-    var commentPreview: ArrayList<CommentView>?,
-    var viewCount: Int,
     var images: ArrayList<String>,
     var body: String,
-    var likeUser: ArrayList<Author>?,
-    var likeLength: Int,
-    var commentLength: Int
+    var likeCount: Int,
+    var commentCount: Int
 )
+
+data class PostDTO(
+    var id: Long=0,
+    var author: Author = Author(),
+    var images: ArrayList<String> = ArrayList(),
+    var body: String? = null,
+    var likeLength: Int = 0,
+    var likeUser: Author? = null,
+    var viewCount: Int = 0,
+    var commentLength: Int = 0,
+    var createdAt: String = "",
+    var modifiedAt: String = "",
+    var isLike: Boolean = false
+){
+    constructor(data: UserPostData) : this() {
+        id = data.postId
+        data.mediaUrls.forEach{images.add(it.url)}
+        body = data.content
+        likeLength = data.likeCount
+        commentLength = data.commentCount
+        createdAt = data.createdAt
+        modifiedAt = data.modifiedAt
+        isLike = data.isLike
+    }
+}
+

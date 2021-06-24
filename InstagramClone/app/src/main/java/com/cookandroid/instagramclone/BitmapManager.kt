@@ -2,11 +2,13 @@ package com.cookandroid.instagramclone
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 
@@ -15,86 +17,96 @@ interface OnResponse<T>{
     fun onFail()
 }
 
-object BitmapManager{
-    val TAG = "bitmanager"
-    var bitmapHash = HashMap<String, Bitmap>()
+interface BitmapManagerInterface{
+    fun getBitmapFromUrl(url: String, con: View, call: OnResponse<Pair<String,Bitmap>>)
+    fun getBitmapFromUrl(urls: ArrayList<String>, con: View, call: OnResponse<Pair<String,Bitmap>>)
+}
 
-    fun getBitmapFromUrl(url: String, con: View, call: OnResponse<Bitmap>) {
-        bitmapHash[url]?.let{
-            call.onSuccess(it)
-        }
-            ?: BitmapProcess(url, con, call).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+class BitmapManager: BitmapManagerInterface{
+    val TAG = "bitmanager"
+    companion object {
+        var bitmapHash = HashMap<String, Bitmap>()
     }
 
-    fun getBitmapFromUrl(urls: ArrayList<String>, con: View, call: OnResponse<Bitmap>) {
+    override fun getBitmapFromUrl(url: String, con: View, call: OnResponse<Pair<String, Bitmap>>) {
+        bitmapHash[url]?.let{
+            call.onSuccess(Pair(url,it))
+        }
+            ?: {
+                try {
+                    Glide.with(con).asBitmap().load(url).apply(RequestOptions().centerCrop()).into(object: SimpleTarget<Bitmap>() {
+                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                            bitmapHash[url] = resource
+                            call.onSuccess(Pair(url,resource))
+                        }
+
+                    })
+                } catch(e:Exception) {
+                    Log.e(TAG, "glide failed (${e.message})")
+                }
+            }()
+    }
+
+    override fun getBitmapFromUrl(urls: ArrayList<String>, con: View, call: OnResponse<Pair<String,Bitmap>>) {
         BitmapsProcess(con, urls, call).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
-}
 
-class BitmapProcess(val url: String, var con: View, val response: OnResponse<Bitmap>) : AsyncTask<Void,Void,Unit>() {
-    val TAG = "single bitmap task"
-    override fun doInBackground(vararg p0: Void?) {
-        try {
-            Glide.with(con).asBitmap().load(url).into(object: SimpleTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    BitmapManager.bitmapHash[url] = resource
-                    response.onSuccess(resource)
-                }
-
-                override fun onLoadFailed(errorDrawable: Drawable?) {
-                    super.onLoadFailed(errorDrawable)
-                    response.onFail()
-                }
-            })
-        } catch(e:Exception) {
-            Log.e(TAG, "glide faild")
-            response.onFail()
+ inner class BitmapsProcess(private var con: View, var urls: ArrayList<String>, var func: OnResponse<Pair<String,Bitmap>>?) : AsyncTask<Void, Void, Unit>(){
+        val TAG = "multi bitmaps task"
+        var resources = Array<Pair<String,Bitmap>>(urls.size){Pair("WaitDefault", BitmapFactory.decodeResource(con.resources, R.drawable.ic_wait))}
+        var hash = HashMap<String, Int>()
+        var cnt = 0
+        var retry = 0
+        var failed = false
+        init{
+            for(i in urls.indices) {
+                hash[urls[i]]  = i
+            }
         }
-    }
-}
 
-class BitmapsProcess(private var con: View, var urls: ArrayList<String>, var func: OnResponse<Bitmap>?) : AsyncTask<Void, Void, Unit>(){
-    val TAG = "multi bitmaps task"
-    var resources = ArrayList<Bitmap>()
-    var cnt = 0
-    var failed = false
-    override fun doInBackground(vararg p0: Void?) {
-        urls.forEach {
+        override fun doInBackground(vararg p0: Void?) {
+            urls.forEach {
+                try {
+                    getBitmapFromUrl(it,con, object: OnResponse<Pair<String,Bitmap>>{
+                        override fun onSuccess(item: Pair<String, Bitmap>) {
+                            cnt++
+                            var i = hash[item.first]
+                            resources[i!!] = item
+                        }
+
+                        override fun onFail() {
+                            cnt++
+                            failed = true
+                        }
+                    })
+                } catch(e:Exception){
+                    cnt++
+                    failed = true
+                    Log.d("url async", "failed - ${e.message}")
+                }
+            }
+            while(cnt != urls.size) {
+                Thread.sleep(100)
+                if(retry > 5) {
+                    failed = true
+                    break
+                }
+                retry++
+            }
+        }
+
+        override fun onPostExecute(result: Unit?) {
+            super.onPostExecute(result)
             try {
-                BitmapManager.getBitmapFromUrl(it,con, object: OnResponse<Bitmap>{
-                    override fun onSuccess(bitmap: Bitmap) {
-                        cnt++
-                        resources.add(bitmap)
-                        Log.e(TAG, "process success")
-                    }
-
-                    override fun onFail() {
-                        cnt++
-                        failed = true
-                    }
-                })
-            } catch(e:Exception){
-                cnt++
-                failed = true
+                if(failed) func?.onFail()
+                else {
+                    func?.let{ resources.forEach{data->it.onSuccess(data) }}
+                }
+            } catch(e:Exception) {
+                func?.onFail()
                 Log.d("url async", "failed - ${e.message}")
             }
         }
-        while(cnt != urls.size) {
-            Thread.sleep(100)
-            Log.d("func", "sleep, ${urls.size} vs ${resources.size} vs $cnt")
-        }
-    }
-
-    override fun onPostExecute(result: Unit?) {
-        super.onPostExecute(result)
-        try {
-            if(failed) func?.onFail()
-            else {
-                func?.let{ resources.forEach{bitmap->it.onSuccess(bitmap)} }
-            }
-        } catch(e:Exception){
-            func?.onFail()
-            Log.d("url async", "failed - ${e.message}")
-        }
     }
 }
+

@@ -56,9 +56,9 @@ class SearchFragment : Fragment() {
                     Log.d("search", "id $findId")
                     var retrofit = InternetCommunication.getRetrofitGson()
                     var retrofitService = retrofit.create(ProfileController::class.java)
-                    var service = retrofitService?.getUserProfile(findId)
+                    var service = retrofitService.getUserProfile(findId)
 
-                    service?.enqueue(object : Callback<ProfileResponse> {
+                    service.enqueue(object : Callback<ProfileResponse> {
                         override fun onFailure(call: Call<ProfileResponse>, t: Throwable) {
                             Log.d(TAG, "get profile failed")
                         }
@@ -72,17 +72,14 @@ class SearchFragment : Fragment() {
                                 200-> {
                                     var member = response.body()
                                     member?.let{ m->
-                                        val info = m.memberDto
-                                        info?.let{
-                                            Log.e(TAG, "nickname ${info.nickname}")
-                                            Log.e(TAG, "displayId ${info.displayId}")
-                                            Log.e(TAG, "profileImageUrl ${info.profileImageUrl}")
-                                            Log.e(TAG, "introduction ${info.introduction}")
-                                            Log.e(TAG, "isFollow ${info.isFollow}")
-                                            Log.e(TAG, "post count ${m.postCount}")
-                                            Log.e(TAG, "follower Count ${m.followerCount}")
-                                            Log.e(TAG, "following Count ${m.followingCount}")
-                                        } ?: Log.e(TAG, "member dto is null")
+                                        Log.e(TAG, "nickname ${m.nickname}")
+                                        Log.e(TAG, "displayId ${m.displayId}")
+                                        Log.e(TAG, "profileImageUrl ${m.profileImageUrl}")
+                                        Log.e(TAG, "introduction ${m.introduction}")
+                                        Log.e(TAG, "isFollow ${m.isFollowedByMe}")
+                                        Log.e(TAG, "post count ${m.postCount}")
+                                        Log.e(TAG, "follower Count ${m.followerCount}")
+                                        Log.e(TAG, "following Count ${m.followingCount}")
 
                                         var usersList = ArrayList<ProfileResponse>()
                                         usersList.add(m)

@@ -21,8 +21,6 @@ object InternetService {
         internetBase?.createFile(data)
     }
     fun init(data: Any? = null,func:((Any?)->Unit)?=null) = internetBase?.init(data,func)
-    fun handlePermission(data:Any? = null) {internetBase?.handlePermission(data)}
-//    fun asGoogleServiceManager(): GoogleServiceManager {return internetBase as GoogleServiceManager}
     fun setInternetBase(base: InternetServiceClass): InternetService {
         internetBase = base
         return this

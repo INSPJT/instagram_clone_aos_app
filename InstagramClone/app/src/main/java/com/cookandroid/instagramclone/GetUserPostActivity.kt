@@ -1,172 +1,167 @@
 package com.cookandroid.instagramclone
 
-import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.AsyncTask
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.transition.Slide
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.VISIBLE
-import android.view.View.inflate
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.RelativeLayout
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.PagerAdapter
-import androidx.viewpager.widget.ViewPager
-import androidx.viewpager2.widget.ViewPager2
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.transition.Transition
-import kotlinx.android.synthetic.main.activity_get_user_post.*
-import kotlinx.android.synthetic.main.image_view_pager_fragment.*
-import kotlinx.android.synthetic.main.view_pager.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.File
-import java.io.IOException
+
+
+class FullSIzeMatcher(private val resources: Resources) : ImageSizeMatcher{
+    override val convertImageSize = {Pair(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)}
+}
+
+class NDividedSIzeMatcher(private val resources: Resources, private val n: Int) : ImageSizeMatcher {
+    override val convertImageSize = {
+        val width = resources.displayMetrics.widthPixels/n
+        Pair(width,width)
+    }
+}
+
+class PostViewHolderMaker(override val bitmapGetter: BitmapManagerInterface, override val matcher: ImageSizeMatcher) : ViewHolderMake {
+    override fun setViewHolder(viewHolder: RecyclerView.ViewHolder, postData: PostDTO) {
+        (viewHolder as PostViewHolder).setInformation(postData)
+    }
+
+    override fun makeViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
+        var view = LayoutInflater.from(parent.context).inflate(R.layout.image_view_pager_fragment, parent, false)
+        val (width, height) = matcher.convertImageSize()
+        view.layoutParams = LinearLayoutCompat.LayoutParams(width, height)
+        return PostViewHolder(view, bitmapGetter)
+    }
+}
+
+class ImageViewHolderMaker(override val bitmapGetter: BitmapManagerInterface, override val matcher: ImageSizeMatcher) : ViewHolderMake, BitmapManagerInterface by bitmapGetter {
+    override fun makeViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
+        var view = LayoutInflater.from(parent.context).inflate(R.layout.add_viewholder,parent, false)//ImageView(parent.context)
+        val (width, height) = matcher.convertImageSize()
+        view.layoutParams = RelativeLayout.LayoutParams(width,height)
+
+        return ImageViewHolder(view, parent)
+    }
+
+    override fun setViewHolder(viewHolder: RecyclerView.ViewHolder, postData: PostDTO) {
+        try {
+            if(postData.images.isNotEmpty()) {
+                bitmapGetter.getBitmapFromUrl(
+                    postData.images[0],
+                    (viewHolder as ImageViewHolder).parent,
+                    object : OnResponse<Pair<String, Bitmap>> {
+                        override fun onFail() {
+                            Log.e("SD", "get bitmap from url failed (image view holder maker)")
+                        }
+
+                        override fun onSuccess(item: Pair<String, Bitmap>) {
+                            viewHolder.imgView.setImageBitmap(item.second)
+                            viewHolder.multiImg.visibility = if(postData.images.size > 1) View.VISIBLE else View.INVISIBLE
+                        }
+                    })
+            }
+        } catch (e: Exception){
+            Log.e("SD", "image view holder maker  get bitmap from url failed ${e.message}")
+        }
+    }
+}
 
 class GetUserPostActivity : Fragment() {
     val TAG = "get user Post"
-    var userPostRecyclerViewAdapter = UserFragmentRecyclerViewAdapter()
+    var bitmapManager = BitmapManager()
+    var postInfo = ArrayList<PostDTO>()
+
     lateinit var content: View
-    inner class PostView(var view: View, var vp: ViewPager2): View(activity) {
-        lateinit var resources: ArrayList<Bitmap>
-
-        constructor(resources: ArrayList<Bitmap>, view : View, vp: ViewPager2): this(view,vp){
-            this.resources = resources
-        }
-    }
-
-    fun setPostDataView(post: UserPostData){
-        val urls = ArrayList<String>()
-        post.mediaUrls.forEach{urls.add(it.url)}
-
-        var view = layoutInflater.inflate(R.layout.image_view_pager_fragment,null)
-        var vp: ViewPager2 = view.findViewById(R.id.pager)
-        var bitmaps = ArrayList<Bitmap>()
-
-        if(!this::content.isInitialized) throw IOException("content is not initialized")
-
-        BitmapManager.getBitmapFromUrl(urls, content, object: OnResponse<Bitmap>{
-            override fun onSuccess(bitmap: Bitmap) {
-                bitmaps.add(bitmap)
-
-                if(bitmaps.size == urls.size) {
-                    vp.adapter = ScreenSlidePagerAdapter2(bitmaps)
-                    userPostRecyclerViewAdapter.addItems(PostView(bitmaps,view,vp))
-                }
-            }
-            override fun onFail() {
-                Log.e(TAG, "get bitmap failed")
-            }
-        })
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        content = inflater.inflate(R.layout.activity_get_user_post,null)
+        content = inflater.inflate(R.layout.fragment_user_profile, null)
 
-        var recyclerView = content.findViewById(R.id.user_post_recycler_view) as RecyclerView
-        recyclerView.adapter = userPostRecyclerViewAdapter
-        recyclerView.layoutManager = GridLayoutManager(activity, 1)
+        var recyclerView = content.findViewById(R.id.profile_recycler_view) as RecyclerView
+        recyclerView.adapter = PostRecyclerView(
+            postInfo,
+            ImageViewHolderMaker(bitmapManager, NDividedSIzeMatcher(resources, 3))
+        )
+        recyclerView.layoutManager = GridLayoutManager(activity, 3)
 
-        var name = arguments?.let{it.getString("name")?.let {name->name
-        }?: ""}?: ""
-        GetUserPostsTask(0x7fffffff, name, object: OnResponse<UserPostData>{
-            override fun onSuccess(item: UserPostData) {
-                setPostDataView(item)
+        var name = arguments?.getParcelable("user") ?: ProfileResponse()
+        name?.let { user ->
+
+            GetUserPostsTask(
+                user = user.displayId ?: "",
+                onResponse = object : OnResponse<UserPostData> {
+                    override fun onSuccess(item: UserPostData) {
+                        postInfo.add(PostDTO(item))
+                        recyclerView.adapter?.notifyDataSetChanged()
+                    }
+
+                    override fun onFail() {
+                        Log.e(TAG, "get post data task by name ,retrofit field")
+                    }
+
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+            var memberService = InternetCommunication.getRetrofitString()
+                .create(MemberController::class.java)
+
+            var followBtn = content.findViewById<Button>(R.id.follow_btn)
+            var unfollowBtn = content.findViewById<Button>(R.id.unfollow_btn)
+
+            followBtn.setOnClickListener{
+                memberService.follow(user.displayId ?: "").enqueue(object:
+                    Callback<String> {
+                    override fun onFailure(call: Call<String>, t: Throwable) {
+                        Log.e("SD", "follow failed ${t.message}")
+                    }
+
+                    override fun onResponse(call: Call<String>, response: Response<String>) {
+                        val message = when(response.code()){
+                            200 -> {
+                                followBtn.text = "팔로우 완료"
+                                unfollowBtn.text = "언팔로우 미완"
+                                "${user.displayId} follow Success"
+                            }
+                            else-> "fail( ${response.body()} ) failed"
+                        }
+                        Log.e("SD", message)
+                    }
+                })
             }
 
-            override fun onFail() {
-                Log.e(TAG, "get post data task by name ,retrofit field")
-            }
+            unfollowBtn.setOnClickListener{
+                memberService.unfollow(user.displayId ?: "").enqueue(object:
+                    Callback<String> {
+                    override fun onFailure(call: Call<String>, t: Throwable) {
+                        Log.e("SD", "unfollow failed ${t.message}")
+                    }
 
-        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                    override fun onResponse(call: Call<String>, response: Response<String>) {
+                        val message = when(response.code()){
+                            200 -> {
+                                followBtn.text = "팔로우 미완"
+                                unfollowBtn.text = "언팔로우 완료"
+                                "${user.displayId} unfollow Success"
+                            }
+                            else-> "fail( ${response.body()} ) failed"
+                        }
+                        Log.e("SD", message)
+                    }
+                })
+            }
+        }
 
         return content
-    }
-
-    inner class UserFragmentRecyclerViewAdapter :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        var postData = ArrayList<View>()
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            var view = LayoutInflater.from(parent.context).inflate(R.layout.image_view_pager_fragment, parent, false)
-            view.layoutParams = LinearLayoutCompat.LayoutParams(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)
-            return PostViewHolder(view)
-        }
-
-        inner class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            var userProfile:ImageView = view.findViewById(R.id.user_post_profile)
-            var userId: TextView = view.findViewById(R.id.post_id_tv)
-            var viewPager: ViewPager2 = view.findViewById(R.id.pager)
-            var likeAcounts: LinearLayout = view.findViewById(R.id.like_accounts)
-            var idTextView: TextView = view.findViewById(R.id.id_text_view)
-            var con: TextView = view.findViewById(R.id.user_post_content)
-            var postTime: TextView = view.findViewById(R.id.post_time)
-
-            fun onBind(v: PostView) {
-                try {
-                    viewPager.adapter = v.vp.adapter
-                }
-                catch(e:Exception) {Log.d(TAG, e.message)}
-            }
-        }
-
-        fun addItems(postData: View) {
-            this.postData.add(postData)
-            notifyDataSetChanged()
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var holder = holder as PostViewHolder
-            holder.viewPager.id = position+1
-
-            holder.onBind(postData[position] as PostView)
-        }
-
-        override fun getItemCount(): Int {
-            return postData.size
-        }
-    }
-
-    inner class ScreenSlidePagerAdapter2(var images:ArrayList<Bitmap>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
-        inner class UserPostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            var imageView: ImageView = view.findViewById(R.id.fragmentImage)
-        }
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            var view = LayoutInflater.from(parent.context).inflate(R.layout.view_pager, parent, false)
-            return UserPostViewHolder(view)
-        }
-
-
-        override fun getItemCount(): Int {
-            return images.size
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var holder = holder as UserPostViewHolder
-            holder.imageView.setImageBitmap(images[position])
-        }
     }
 }

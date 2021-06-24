@@ -6,7 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src= "@drawable/ic_launcher_background"
-        android:id="@+id/viewHolder_img">
+        android:id="@+id/viewHolder_img"
+        android:scaleType="centerCrop">
 
     </ImageView>
     <TextView
@@ -21,6 +22,8 @@
         android:textAlignment="center"
         android:autoSizeTextType="uniform"
         android:background="#777"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
         ></TextView>
 
 </RelativeLayout>
