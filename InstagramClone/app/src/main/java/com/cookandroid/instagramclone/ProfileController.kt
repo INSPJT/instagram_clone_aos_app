@@ -9,7 +9,7 @@ interface ProfileController{
         "content-type: application/json")
     @GET("/member/posts")
     fun getUserPosts(
-        @Query("lastPostId") lastPostId: Int
+        @Query("lastPostId") lastPostId: Long
     ): Call<ArrayList<UserPostData>>
 
 
@@ -18,12 +18,12 @@ interface ProfileController{
     @GET("/members/{displayId}/posts")
     fun getUserPosts(
         @Path("displayId") displayId: String,
-        @Query("lastPostId") lastPostId: Int
+        @Query("lastPostId") lastPostId: Long
     ): Call<ArrayList<UserPostData>>
 
     @Headers("accpet: text/plain",
         "content-type: application/json")
-    @GET("/members/{displayId}/profiles")
+    @GET("/members/{displayId}")
     fun getUserProfile(
         @Path("displayId") displayId: String
     ): Call<ProfileResponse>

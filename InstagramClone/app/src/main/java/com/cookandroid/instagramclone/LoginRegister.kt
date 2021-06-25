@@ -84,7 +84,6 @@ class LoginRegisterActivity : AppCompatActivity() {
                                 Log.d("code", response.code().toString())
                             }
                         }
-
                     }
 
                     override fun onFailure(call: Call<String>, t: Throwable) {

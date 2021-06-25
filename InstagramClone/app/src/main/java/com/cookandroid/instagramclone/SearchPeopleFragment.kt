@@ -51,22 +51,22 @@ class SearchPeopleFragment : Fragment() {
             recyclerView.adapter = FindUserFragmentRecyclerViewAdapter()
             recyclerView.layoutManager = GridLayoutManager(container?.context,1)
 
-            arguments?.let{ it ->
+            arguments?.let{
                 it.getParcelableArrayList<ProfileResponse>("user")?.let{user -> usersList = user}
-                usersList.forEach {
-                    Log.e(TAG, "version 2 ${it.memberDto?.nickname}")
+                usersList.forEach { profile->
+                    Log.e(TAG, "version 2 ${profile.nickname}")
                 }
             }
             recyclerView.adapter?.notifyDataSetChanged()
             v
-        } ?: null
+        }
     }
 
     inner class FindUserFragmentRecyclerViewAdapter:
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            var width = resources.displayMetrics.widthPixels / 3
+            var width = resources.displayMetrics.widthPixels
             var height = resources.displayMetrics.heightPixels/10
             var view = LayoutInflater.from(parent.context).inflate(R.layout.user_find_result,parent,false)
             view.layoutParams = LinearLayout.LayoutParams(width,height)
@@ -78,10 +78,11 @@ class SearchPeopleFragment : Fragment() {
             var displayIdTextView = view.findViewById<TextView>(R.id.profile_displayed_id)
             var IdTextView = view.findViewById<TextView>(R.id.profile_id)
             var profileImage = view.findViewById<ImageView>(R.id.user_find_profile_img)
-            var fragment = UserProfileFragment()
-            init{
+            var fragment = GetUserPostActivity()
+            init {
+                fragment.arguments = Bundle(1)
                 view.setOnClickListener {
-                    activity?.let{
+                    activity?.let {
                         it.supportFragmentManager
                             .beginTransaction()
                             .replace(R.id.main_content, fragment)
@@ -94,10 +95,10 @@ class SearchPeopleFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            var holder = holder as UserFindResultViewHolder
-            var name = usersList[position].memberDto?.nickname ?: ""
-            holder.displayIdTextView.text = usersList[position].memberDto?.nickname
-            holder.IdTextView.text = usersList[position].memberDto?.displayId
+            var h = holder as UserFindResultViewHolder
+            h.fragment.arguments?.putParcelable("user", usersList[position])
+            h.displayIdTextView.text = usersList[position].nickname
+            h.IdTextView.text = usersList[position].displayId
         }
 
         override fun getItemCount(): Int {

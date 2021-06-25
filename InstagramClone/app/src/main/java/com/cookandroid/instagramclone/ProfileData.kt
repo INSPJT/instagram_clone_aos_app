@@ -1,6 +1,5 @@
 package com.cookandroid.instagramclone
 
-import android.annotation.SuppressLint
 import android.os.Parcel
 import android.os.Parcelable
 
@@ -11,7 +10,7 @@ data class MediaUrls(
 )
 
 data class UserPostData(
-    var postId: Int,
+    var postId: Long,
     var mediaUrls: ArrayList<MediaUrls>,
     var content: String?,
     var likeCount: Int,
@@ -22,11 +21,11 @@ data class UserPostData(
 )
 
 data class MemberDTO(
-    var nickname: String?,
-    var displayId: String?,
-    var profileImageUrl: String?,
-    var introduction: String?,
-    var isFollow: Boolean
+    var nickname: String? = "",
+    var displayId: String? = "",
+    var profileImageUrl: String? = "",
+    var introduction: String? = "",
+    var isFollow: Boolean = false
 ): Parcelable{
     constructor(parcel: Parcel) : this(
         parcel.readString(),
@@ -37,13 +36,12 @@ data class MemberDTO(
     ) {
     }
 
-    @SuppressLint("NewApi")
     override fun writeToParcel(p0: Parcel?, p1: Int) {
         p0?.writeString(nickname)
         p0?.writeString(displayId)
         p0?.writeString(profileImageUrl)
         p0?.writeString(introduction)
-        p0?.writeBoolean(isFollow)
+        p0?.writeByte(if(isFollow)1.toByte() else 0.toByte())
     }
 
     override fun describeContents(): Int {
@@ -62,24 +60,36 @@ data class MemberDTO(
 }
 
 data class ProfileResponse(
-    var memberDto: MemberDTO?,
-    var postCount: Int,
-    var followerCount: Int,
-    var followingCount: Int
+    var displayId: String? = null,
+    var nickname: String?= null,
+    var profileImageUrl: String? = null,
+    var introduction:String? = null,
+    var postCount: Long = 0,
+    var followingCount: Long = 0,
+    var followerCount: Long= 0,
+    var isFollowedByMe: Boolean = false
 ): Parcelable{
     constructor(parcel: Parcel) : this(
-        parcel.readParcelable(MemberDTO.javaClass.classLoader),
-        parcel.readInt(),
-        parcel.readInt(),
-        parcel.readInt()
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readLong(),
+        parcel.readLong(),
+        parcel.readLong(),
+        parcel.readByte() != 0.toByte()
     ) {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(memberDto, 0)
-        parcel.writeInt(postCount)
-        parcel.writeInt(followerCount)
-        parcel.writeInt(followingCount)
+        parcel.writeString(displayId)
+        parcel.writeString(nickname)
+        parcel.writeString(profileImageUrl)
+        parcel.writeString(introduction)
+        parcel.writeLong(postCount)
+        parcel.writeLong(followingCount)
+        parcel.writeLong(followerCount)
+        parcel.writeByte(if(isFollowedByMe) 1.toByte() else 0.toByte())
     }
 
     override fun describeContents(): Int {

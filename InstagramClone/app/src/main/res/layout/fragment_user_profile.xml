@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:context=".MyProfileActivity"
     android:orientation="vertical"
     >
@@ -45,13 +45,12 @@
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
-    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="match_parent" >
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -176,16 +175,10 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-            <Button
+            <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
-                android:layout_height="1000dp"
-                android:text="awlefjalkfjaljrgflakr"></Button>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="1000dp"
-                android:text="awlefjalkfjaljrgflakr"></Button>
+                android:layout_height="match_parent"
+                android:id="@+id/profile_recycler_view"
+                ></androidx.recyclerview.widget.RecyclerView>
         </LinearLayout>
-    </ScrollView>
 </LinearLayout>
