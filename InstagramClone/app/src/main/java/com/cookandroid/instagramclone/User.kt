@@ -2,7 +2,9 @@ package com.cookandroid.instagramclone
 
 import android.os.Parcel
 import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class User(
     var email: String?,
     var password: String?,
@@ -12,7 +14,12 @@ data class User(
     var refreshToken: String?,
     var nickname: String?,
     var expiresTime: String?
-) : Parcelable {
+) : Parcelable
+
+
+
+
+/*{
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString(),
@@ -50,3 +57,4 @@ data class User(
         }
     }
 }
+*/

@@ -1,5 +1,6 @@
 package com.cookandroid.instagramclone
 
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.AsyncTask
@@ -15,6 +16,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.fragment_user_profile.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -81,6 +83,8 @@ class GetUserPostActivity : Fragment() {
     var bitmapManager = BitmapManager()
     var postInfo = ArrayList<PostDTO>()
 
+    private val sharedManager: SharedManager by lazy { SharedManager(requireContext()) }
+
     lateinit var content: View
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -118,6 +122,7 @@ class GetUserPostActivity : Fragment() {
 
             var followBtn = content.findViewById<Button>(R.id.follow_btn)
             var unfollowBtn = content.findViewById<Button>(R.id.unfollow_btn)
+            val logoutBtn = content.findViewById<Button>(R.id.logout_btn)
 
             followBtn.setOnClickListener{
                 memberService.follow(user.displayId ?: "").enqueue(object:
@@ -138,6 +143,14 @@ class GetUserPostActivity : Fragment() {
                         Log.e("SD", message)
                     }
                 })
+            }
+
+            logoutBtn.setOnClickListener { // 여기 부분은 다시 고민좀 해야 할거같지만 이정도면 괜찮을듯 -> layout 을 수정해야함
+                Log.d("login 화면으로" , "login 화면으로 이동")
+                val lastUser = User("","","",0,"","","","")
+                sharedManager.saveCurrentUser(lastUser)
+                val intent = Intent(getActivity(),LoginActivity::class.java)
+                startActivity(intent)
             }
 
             unfollowBtn.setOnClickListener{

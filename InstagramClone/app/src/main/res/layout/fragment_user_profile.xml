@@ -42,6 +42,17 @@
                 android:layout_height="20dp"
                 android:src="@drawable/ic_plus"
                 android:id="@+id/hamburger_btn"/>
+
+            <Button
+                android:layout_width="53dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="251dp"
+                android:layout_marginEnd="2dp"
+                android:layout_toStartOf="@+id/hamburger_btn"
+                android:layout_toEndOf="@+id/user_name"
+                android:text="logout"
+                android:id="@+id/logout_btn"/>
+
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
