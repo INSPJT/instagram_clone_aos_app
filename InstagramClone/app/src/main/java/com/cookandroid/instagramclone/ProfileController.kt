@@ -10,7 +10,7 @@ interface ProfileController{
     @GET("/member/posts")
     fun getUserPosts(
         @Query("lastPostId") lastPostId: Long
-    ): Call<ArrayList<UserPostData>>
+    ): Call<FeedDto>
 
 
     @Headers("accpet: text/plain",
@@ -19,7 +19,7 @@ interface ProfileController{
     fun getUserPosts(
         @Path("displayId") displayId: String,
         @Query("lastPostId") lastPostId: Long
-    ): Call<ArrayList<UserPostData>>
+    ): Call<FeedDto>
 
     @Headers("accpet: text/plain",
         "content-type: application/json")

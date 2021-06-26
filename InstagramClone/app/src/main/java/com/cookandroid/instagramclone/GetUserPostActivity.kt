@@ -55,9 +55,10 @@ class ImageViewHolderMaker(override val bitmapGetter: BitmapManagerInterface, ov
 
     override fun setViewHolder(viewHolder: RecyclerView.ViewHolder, postData: PostDTO) {
         try {
-            if(postData.images.isNotEmpty()) {
+            if(postData.mediaUrls.isNotEmpty()) {
+                var urls = postData.getUrls()
                 bitmapGetter.getBitmapFromUrl(
-                    postData.images[0],
+                    urls[0],
                     (viewHolder as ImageViewHolder).parent,
                     object : OnResponse<Pair<String, Bitmap>> {
                         override fun onFail() {
@@ -66,7 +67,7 @@ class ImageViewHolderMaker(override val bitmapGetter: BitmapManagerInterface, ov
 
                         override fun onSuccess(item: Pair<String, Bitmap>) {
                             viewHolder.imgView.setImageBitmap(item.second)
-                            viewHolder.multiImg.visibility = if(postData.images.size > 1) View.VISIBLE else View.INVISIBLE
+                            viewHolder.multiImg.visibility = if(urls.size > 1) View.VISIBLE else View.INVISIBLE
                         }
                     })
             }
@@ -101,9 +102,9 @@ class GetUserPostActivity : Fragment() {
 
             GetUserPostsTask(
                 user = user.displayId ?: "",
-                onResponse = object : OnResponse<UserPostData> {
-                    override fun onSuccess(item: UserPostData) {
-                        postInfo.add(PostDTO(item))
+                onResponse = object : OnResponse<PostDTO> {
+                    override fun onSuccess(item: PostDTO) {
+                        postInfo.add(item)
                         recyclerView.adapter?.notifyDataSetChanged()
                     }
 

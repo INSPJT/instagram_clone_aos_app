@@ -42,11 +42,12 @@ interface PostService{
 }
 
 //get post by id
-class GetUserPostsTask(var lastId: Long = 0x7fffffffffffffffL, var user: String="", var onResponse: OnResponse<UserPostData>, var onAllSucess: ()->Unit = {}): AsyncTask<Void, Void, Unit>() {
+class GetUserPostsTask(var lastId: Long = 0x7fffffffffffffffL, var user: String="", var onResponse: OnResponse<PostDTO>, var onAllSucess: ()->Unit = {}): AsyncTask<Void, Void, Unit>() {
     companion object{
         val TAG = "GetUserPostTask"
     }
     var isEnd = false
+    var isContinue = false
 
     override fun doInBackground(vararg p0: Void?) {
         var retrofit = InternetCommunication.getRetrofitGson()
@@ -54,29 +55,36 @@ class GetUserPostsTask(var lastId: Long = 0x7fffffffffffffffL, var user: String=
         var service = if(user == "") retrofitService.getUserPosts(lastId) else retrofitService.getUserPosts(user, lastId)
         Log.d(TAG, "start")
 
-        service.enqueue(object: Callback<ArrayList<UserPostData>> {
-            override fun onFailure(call: Call<ArrayList<UserPostData>>, t: Throwable) {
+        service.enqueue(object: Callback<FeedDto> {
+            override fun onFailure(call: Call<FeedDto>, t: Throwable) {
                 lastId = -1
                 isEnd = true
                 Log.d("get posts task", "failed ${t.message}")
             }
 
             override fun onResponse(
-                call: Call<ArrayList<UserPostData>>,
-                response: Response<ArrayList<UserPostData>>
+                call: Call<FeedDto>,
+                response: Response<FeedDto>
             ) {
                 lastId = -1
                 val message = when (response.code()) {
                     200 -> {
                         val data = response.body()
-                        data?.forEach { post ->
-                            try {
-                                onResponse.onSuccess(post)
-                                lastId = post.postId
-                            } catch(e:Exception) {
-                                Log.d(TAG, "set post data view failed")
+                        isContinue = data?.let{data->
+                            data.posts.forEach { post ->
+                                try {
+                                    onResponse.onSuccess(post)
+                                    lastId = post.id
+                                } catch(e:Exception) {
+                                    Log.d(TAG, "set post data view failed")
+                                }
                             }
-                        }
+
+                            !data.hasNext
+                        } ?: {
+                            Log.e("SD", "$TAG data is null")
+                            false
+                        }()
                         isEnd = true
                         "Success"
                     }
@@ -102,7 +110,7 @@ class GetUserPostsTask(var lastId: Long = 0x7fffffffffffffffL, var user: String=
     override fun onPostExecute(result: Unit?) {
         super.onPostExecute(result)
         onAllSucess()
-        if(lastId != -1L) {
+        if(isContinue) {
             GetUserPostsTask(lastId, user, onResponse, onAllSucess).execute()
         }
     }
@@ -147,11 +155,12 @@ class PostViewHolder(val view: View, private val bitmapGetter: BitmapManagerInte
         bitmaps = Array(data.mediaUrls.size){ BitmapFactory.decodeResource(view.resources, R.drawable.ic_wait )}
         viewPager.adapter = ScreenSlidePagerAdapter2(bitmaps)
 
-        for(idx in data.mediaUrls.indices) {
-            urlToIter[data.mediaUrls[idx].url] = idx
+        var urls = data.getUrls()
+        for(idx in urls.indices) {
+            urlToIter[urls[idx]] = idx
         }
 
-        bitmapGetter.getBitmapFromUrl(data.mediaUrls, view, object: OnResponse<Pair<String,Bitmap>> {
+        bitmapGetter.getBitmapFromUrl(urls, view, object: OnResponse<Pair<String,Bitmap>> {
             override fun onSuccess(item: Pair<String, Bitmap>) {
                 try {
                     var pos = urlToIter[item.first]!!
