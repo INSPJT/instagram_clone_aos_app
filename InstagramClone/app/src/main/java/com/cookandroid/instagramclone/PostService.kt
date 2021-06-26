@@ -144,14 +144,14 @@ class PostViewHolder(val view: View, private val bitmapGetter: BitmapManagerInte
 
     fun setInformation(data: PostDTO) {
         postInfo = data
-        bitmaps = Array(data.images.size){ BitmapFactory.decodeResource(view.resources, R.drawable.ic_wait )}
+        bitmaps = Array(data.mediaUrls.size){ BitmapFactory.decodeResource(view.resources, R.drawable.ic_wait )}
         viewPager.adapter = ScreenSlidePagerAdapter2(bitmaps)
 
-        for(idx in data.images.indices) {
-            urlToIter[data.images[idx]] = idx
+        for(idx in data.mediaUrls.indices) {
+            urlToIter[data.mediaUrls[idx].url] = idx
         }
 
-        bitmapGetter.getBitmapFromUrl(data.images, view, object: OnResponse<Pair<String,Bitmap>> {
+        bitmapGetter.getBitmapFromUrl(data.mediaUrls, view, object: OnResponse<Pair<String,Bitmap>> {
             override fun onSuccess(item: Pair<String, Bitmap>) {
                 try {
                     var pos = urlToIter[item.first]!!

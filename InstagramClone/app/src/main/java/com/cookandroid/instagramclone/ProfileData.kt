@@ -3,11 +3,6 @@ package com.cookandroid.instagramclone
 import android.os.Parcel
 import android.os.Parcelable
 
-data class MediaUrls(
-    var mediaUrlId:Int,
-    var url: String,
-    var type: String
-)
 
 data class UserPostData(
     var postId: Long,

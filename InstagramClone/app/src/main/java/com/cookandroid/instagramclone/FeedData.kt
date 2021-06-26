@@ -18,6 +18,6 @@ data class Pageable(
 )
 
 data class FeedDto(
-    val feeds: ArrayList<PostDTO>,
+    val posts: ArrayList<PostDTO>,
     val hasNext: Boolean
 )
