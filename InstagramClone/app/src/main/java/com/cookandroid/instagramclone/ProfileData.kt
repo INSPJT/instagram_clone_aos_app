@@ -3,18 +3,6 @@ package com.cookandroid.instagramclone
 import android.os.Parcel
 import android.os.Parcelable
 
-
-//data class UserPostData(
-//    var postId: Long,
-//    var mediaUrls: ArrayList<MediaUrls>,
-//    var content: String?,
-//    var likeCount: Int,
-//    var commentCount: Int,
-//    var createdAt: String,
-//    var modifiedAt: String,
-//    var isLike: Boolean
-//)
-
 data class MemberDTO(
     var nickname: String? = "",
     var displayId: String? = "",
