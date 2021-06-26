@@ -59,21 +59,10 @@ data class PostDTO(
     var createdAt: String = "",
     var modifiedAt: String = "",
     var isLike: Boolean = false
-){
-    fun getUrls(): ArrayList<String>{
+) {
+    fun getUrls(): ArrayList<String> {
         var res = ArrayList<String>()
-        mediaUrls.forEach{res.add(it.url)}
+        mediaUrls.forEach { res.add(it.url) }
         return res
     }
-//    constructor(data: UserPostData) : this() {
-//        id = data.postId
-//        mediaUrls = data.mediaUrls
-//        body = data.content
-//        likeLength = data.likeCount
-//        commentLength = data.commentCount
-//        createdAt = data.createdAt
-//        modifiedAt = data.modifiedAt
-//        isLike = data.isLike
-//    }
 }
-
