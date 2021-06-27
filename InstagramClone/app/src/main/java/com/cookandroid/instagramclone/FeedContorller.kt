@@ -37,14 +37,14 @@ class GetFeedTask(var lastPostId:Long? = null, val onResponse: OnResponse<FeedIn
                     }
 
                     override fun onResponse(call: Call<FeedDto>, response: Response<FeedDto>) {
-                        response.body()?.let{
-                            it.feeds.let {post->
-                                onResponse.onSuccess(FeedInfo(lastPostId?.let{lastPostId} ?: 0, post, !it.hasNext))
+                        response.body()?.let {
+                            it.posts.let { post->
+                                onResponse.onSuccess(FeedInfo(lastPostId?.let { lastPostId }
+                                    ?: 0, post, !it.hasNext))
                                 isLast = !it.hasNext
-                                lastPostId = if(post.isNotEmpty())post.last().id else 1
-                            }
+                                lastPostId = if(post.isNotEmpty())post.last().id else 1}
+                                isEnd = true
                         }
-                        isEnd = true
                     }
                 })
         } catch(e: Exception) {

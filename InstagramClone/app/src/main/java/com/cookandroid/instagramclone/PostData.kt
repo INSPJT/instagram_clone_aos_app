@@ -20,6 +20,11 @@ data class CommentView(
 
 data class Author(
     var displayId: String = "",
+    var nickname: String = "",
+    var introduction: String?= null,
+    var postCount: Long = 0,
+    var followingCount: Long = 0,
+    var followerCount: Long = 0,
     var isFollowedByMe: Boolean =false,
     var profileImageUrl: String? = null
 )
@@ -36,10 +41,16 @@ data class GetPostData(
     var commentCount: Int
 )
 
+data class MediaUrls(
+    var mediaUrlId: Long,
+    var url: String,
+    var type: String
+)
+
 data class PostDTO(
     var id: Long=0,
     var author: Author = Author(),
-    var images: ArrayList<String> = ArrayList(),
+    var mediaUrls: ArrayList<MediaUrls> = ArrayList(),
     var body: String? = null,
     var likeLength: Int = 0,
     var likeUser: Author? = null,
@@ -48,16 +59,10 @@ data class PostDTO(
     var createdAt: String = "",
     var modifiedAt: String = "",
     var isLike: Boolean = false
-){
-    constructor(data: UserPostData) : this() {
-        id = data.postId
-        data.mediaUrls.forEach{images.add(it.url)}
-        body = data.content
-        likeLength = data.likeCount
-        commentLength = data.commentCount
-        createdAt = data.createdAt
-        modifiedAt = data.modifiedAt
-        isLike = data.isLike
+) {
+    fun getUrls(): ArrayList<String> {
+        var res = ArrayList<String>()
+        mediaUrls.forEach { res.add(it.url) }
+        return res
     }
 }
-

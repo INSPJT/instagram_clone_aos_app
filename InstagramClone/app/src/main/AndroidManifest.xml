@@ -22,7 +22,6 @@
         <activity android:name=".NavigationActivity">
         </activity>
         <activity android:name=".GetUserPostActivity"></activity>
-        <activity android:name=".MyProfileActivity"></activity>
         <activity android:name=".MainNavigationActivity">
         </activity>
         <activity android:name=".LoginRegisterActivity" />
